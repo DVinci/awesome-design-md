@@ -1,0 +1,17 @@
+{
+  "name": "awesome-design-md",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:format": "playwright test tests/design-md-format.spec.ts",
+    "test:consistency": "playwright test tests/consistency.spec.ts",
+    "test:links": "playwright test tests/links.spec.ts",
+    "test:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "js-yaml": "^4.1.0",
+    "glob": "^11.0.0"
+  }
+}

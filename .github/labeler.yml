@@ -1,0 +1,19 @@
+design-system:
+  - changed-files:
+    - any-glob-to-any-file: 'design-md/**'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - 'CLAUDE.md'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'
+      - 'playwright.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tests/**'

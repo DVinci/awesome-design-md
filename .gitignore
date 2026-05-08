@@ -1,1 +1,63 @@
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Node.js / npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+dist/
+.nyc_output/
+coverage/
+*.tgz
+*.log
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+.playwright-cache/
+
+# Editors — VSCode
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Editors — JetBrains
+.idea/
+*.iml
+*.iws
+
+# Temp / env
+*.swp
+*.swo
+*.tmp
+.env
+.env.local
+.env.*.local

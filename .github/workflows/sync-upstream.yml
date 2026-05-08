@@ -1,0 +1,44 @@
+name: Sync from Upstream
+
+on:
+  schedule:
+    - cron: '0 7 * * *'  # Daily 7am UTC
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync from VoltAgent upstream
+        id: sync
+        run: |
+          git remote add upstream https://github.com/VoltAgent/awesome-design-md.git
+          git fetch upstream
+          git checkout main
+          if git merge upstream/main --no-edit; then
+            git push origin main
+            echo "synced=true" >> $GITHUB_OUTPUT
+          else
+            echo "synced=false" >> $GITHUB_OUTPUT
+            git merge --abort
+          fi
+
+      - name: Open issue on conflict
+        if: steps.sync.outputs.synced == 'false'
+        run: |
+          gh issue create \
+            --title "Upstream sync conflict — manual merge needed" \
+            --body "The daily sync from VoltAgent/awesome-design-md encountered a merge conflict. Manual resolution required: \`git fetch upstream && git merge upstream/main\`" \
+            --label "upstream-sync"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
