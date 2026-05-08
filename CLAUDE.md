@@ -114,6 +114,10 @@ npm run test:ui           # Playwright visual debug mode
 | `pr-labeler.yml` | Every PR | Auto-applies labels by changed path |
 | `sync-upstream.yml` | Daily (7am UTC) | Merges `VoltAgent/awesome-design-md:main` → local `main` |
 
+## Skills
+
+**generate-design-md** — When asked to create a design.md, copy the style of a site, capture a site's design, replicate a site's visual identity, or add a site to the collection, read `.claude/skills/generate-design-md/SKILL.md` and follow it exactly before doing anything else.
+
 ## Syncing from Upstream Manually
 
 ```bash
