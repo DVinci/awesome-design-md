@@ -42,6 +42,12 @@
     "path": "design-md/binance/DESIGN.md"
   },
   {
+    "name": "Blender",
+    "slug": "blender",
+    "description": "Blender is the free and open source 3D creation suite. Its design system reflects a dark-first creative-tool aesthetic — deep charcoal canvases, electric blue gradient CTAs, and a single Inter typefac",
+    "path": "design-md/blender/DESIGN.md"
+  },
+  {
     "name": "BMW",
     "slug": "bmw",
     "description": "BMW's corporate site — distinct from BMW M's motorsport-bombastic variant, this is a measured and settled corporate-automotive interface. On a light (cream-tinted white) canvas, BMW corporate blue (#1",
@@ -426,6 +432,12 @@
     "path": "design-md/uber/DESIGN.md"
   },
   {
+    "name": "Ubuntu",
+    "slug": "ubuntu",
+    "description": "Ubuntu's design system reflects the open-source spirit of its Linux heritage — bold, functional, and community-driven. The iconic Ubuntu Orange (#E95420) anchors a palette that pairs warm dark surface",
+    "path": "design-md/ubuntu/DESIGN.md"
+  },
+  {
     "name": "UNESCO",
     "slug": "unesco",
     "description": "UNESCO's website embodies institutional clarity at global scale — a clean, light-mode design anchored by a single brand blue and Inter typography that prioritises legibility and trust over visual nove",
@@ -436,6 +448,12 @@
     "slug": "unity",
     "description": "Unity's design system is a cinematic, dark-canvas developer platform identity that serves game creators worldwide. Built entirely for dark mode, the stark black base canvas and layered near-black surf",
     "path": "design-md/unity/DESIGN.md"
+  },
+  {
+    "name": "Unreal Engine",
+    "slug": "unrealengine",
+    "description": "Unreal Engine's design system is a cinematic dark-canvas toolkit built for the world's most advanced real-time 3D creation platform. Deep near-black backgrounds (#121212) set a stage-like foundation, ",
+    "path": "design-md/unrealengine/DESIGN.md"
   },
   {
     "name": "Vercel",
@@ -466,6 +484,12 @@
     "slug": "webflow",
     "description": "Webflow's website is a visually rich, tool-forward platform that communicates \"design without code\" through clean white surfaces, the signature Webflow Blue (`#146ef5`), and a rich secondary color pal",
     "path": "design-md/webflow/DESIGN.md"
+  },
+  {
+    "name": "Wikipedia",
+    "slug": "wikipedia",
+    "description": "Wikipedia's design language is utilitarian and deeply readable — the Codex design system built by the Wikimedia Foundation prioritizes content legibility above all else. A cool near-white canvas (#F8F",
+    "path": "design-md/wikipedia/DESIGN.md"
   },
   {
     "name": "WIRED",
