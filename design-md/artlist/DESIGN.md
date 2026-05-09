@@ -20,81 +20,82 @@ colors:
   muted: "#B2B2B2"
   subtle: "#666666"
   canvas: "#171717"
+  canvas-deep: "#0D0D0D"
   surface: "#1F1F1F"
   surface-mid: "#2B2B2B"
   surface-elevated: "#333333"
   on-dark: "#FFFFFF"
-  hairline: "#333333"
+  hairline: "#4D4D4D"
   hairline-subtle: "#585454"
-  success: "#54F893"
+  semantic-success: "#81C784"
+  semantic-success-vivid: "#54F893"
   semantic-error: "#CA514E"
-  semantic-success: "#54F893"
-  accent-orange: "#ED8445"
-  accent-warm: "#F6D4A1"
+  accent-gold: "#F6BF53"
+  accent-gold-light: "#FFEEB0"
 
 typography:
   display-xl:
-    fontFamily: "var(--font-publico-banner), Georgia, serif"
+    fontFamily: "publicoBanner, Georgia, serif"
     fontSize: 104px
     fontWeight: 300
     lineHeight: 0.88
     letterSpacing: -3.2px
   display-lg:
-    fontFamily: "var(--font-publico-banner), Georgia, serif"
+    fontFamily: "publicoBanner, Georgia, serif"
     fontSize: 72px
     fontWeight: 300
     lineHeight: 1.0
     letterSpacing: -2.16px
   display-md:
-    fontFamily: "var(--font-publico-banner), Georgia, serif"
+    fontFamily: "publicoBanner, Georgia, serif"
     fontSize: 56px
     fontWeight: 300
     lineHeight: 1.0
     letterSpacing: -1.68px
   title-lg:
-    fontFamily: "var(--font-artlist-sans), sans-serif"
+    fontFamily: "artlistSans, sans-serif"
     fontSize: 28px
     fontWeight: 500
     lineHeight: 1.25
     letterSpacing: -0.28px
   title-md:
-    fontFamily: "var(--font-artlist-sans), sans-serif"
+    fontFamily: "artlistSans, sans-serif"
     fontSize: 24px
     fontWeight: 500
     lineHeight: 1.25
     letterSpacing: -0.16px
   body-lg:
-    fontFamily: "var(--font-artlist-sans), sans-serif"
+    fontFamily: "artlistSans, sans-serif"
     fontSize: 18px
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: 0
   body-md:
-    fontFamily: "var(--font-artlist-sans), sans-serif"
+    fontFamily: "artlistSans, sans-serif"
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: 0
   body-sm:
-    fontFamily: "var(--font-artlist-sans), sans-serif"
+    fontFamily: "artlistSans, sans-serif"
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.25
     letterSpacing: 0
   caption:
-    fontFamily: "var(--font-artlist-sans), sans-serif"
+    fontFamily: "artlistSans, sans-serif"
     fontSize: 12px
     fontWeight: 400
     lineHeight: 1.0
     letterSpacing: 0
   button:
-    fontFamily: "var(--font-artlist-sans), sans-serif"
+    fontFamily: "artlistSans, sans-serif"
     fontSize: 14px
     fontWeight: 500
     lineHeight: 1.75
     letterSpacing: 0
   nav-link:
-    fontFamily: "var(--font-artlist-sans), sans-serif"
+    fontFamily: "artlistSans, sans-serif"
     fontSize: 14px
     fontWeight: 500
     lineHeight: 1.25
@@ -163,14 +164,14 @@ components:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.xl}"
     padding: "{spacing.xl}"
-    border: "1px solid {colors.hairline-subtle}"
+    border: "1px solid {colors.hairline}"
     boxShadow: "inset 0px 1.1px 1.1px 0px rgba(255,255,255,0.25), 0px 8px 32px 0px rgba(0,0,0,0.15)"
 
   card-pricing:
     backgroundColor: "{colors.canvas}"
     rounded: "{rounded.xl}"
     padding: "36px 32px"
-    border: "1px solid {colors.hairline-subtle}"
+    border: "1px solid {colors.hairline}"
 
   card-pricing-featured:
     backgroundColor: "{colors.surface}"
@@ -212,7 +213,7 @@ components:
     typography: "{typography.caption}"
 
   badge-success:
-    backgroundColor: "{colors.semantic-success}"
+    backgroundColor: "{colors.semantic-success-vivid}"
     textColor: "{colors.primary-contrast}"
     rounded: "{rounded.pill}"
     padding: "4px 6px"
@@ -229,6 +230,7 @@ Artlist is built for creative professionals who live inside video editing timeli
 The type system pairs the intellectual authority of Publico Banner serif — used exclusively for large-scale display headlines — with Artlist Sans, a proprietary grotesque that handles all UI chrome. Together they achieve a dual personality: editorial gravity in hero sections, clean efficiency everywhere else. Spacing is generous, layouts breathe, and the system resists ornamentation. This is a platform for people who know what they want.
 
 Key visual characteristics:
+
 - Near-black dark canvas (`#171717`) is the universal page background — light mode does not exist for the main product
 - Single-color accent system: electric yellow `#FFDA2A` is the only true accent color; all CTAs use it
 - Dual-font hierarchy: Publico Banner serif (light weight 300, negative tracking) for display; Artlist Sans grotesque for UI
@@ -254,6 +256,7 @@ Key visual characteristics:
 
 | Token | Hex | Use |
 | --- | --- | --- |
+| `canvas-deep` | `#0D0D0D` | Deepest backgrounds, hero overlays, banner underlays |
 | `canvas` | `#171717` | Universal page background, dark nav drawer |
 | `surface` | `#1F1F1F` | Elevated cards, dropdown panels, modals |
 | `surface-mid` | `#2B2B2B` | Input backgrounds, secondary card surfaces |
@@ -267,17 +270,18 @@ Key visual characteristics:
 | `body` | `#E6E6E6` | Body copy, paragraph text |
 | `muted` | `#B2B2B2` | Secondary labels, inactive nav links, metadata |
 | `subtle` | `#666666` | Disabled text, placeholder text |
-| `hairline` | `#333333` | Internal component dividers |
-| `hairline-subtle` | `#585454` | Card borders, separator lines |
+| `hairline` | `#4D4D4D` | Card borders, separator lines (Tailwind `border-medium-low-emphasis`) |
+| `hairline-subtle` | `#585454` | Legacy subtle borders, older component overrides |
 
 ### Semantic Colors
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `semantic-success` | `#54F893` | Check marks on pricing feature lists, success badges |
+| `semantic-success` | `#81C784` | Success states in UI (MUI green, Tailwind `text-success`) |
+| `semantic-success-vivid` | `#54F893` | Pricing feature checkmarks, positive indicator badges |
 | `semantic-error` | `#CA514E` | Error states, destructive actions |
-| `accent-orange` | `#ED8445` | Max plan gradient (brand premium tier) |
-| `accent-warm` | `#F6D4A1` | Max plan gradient warm end, promotional highlights |
+| `accent-gold` | `#F6BF53` | Max plan gradient end, reactivation banner |
+| `accent-gold-light` | `#FFEEB0` | Max plan gradient start, premium plan highlights |
 
 ---
 
@@ -285,33 +289,34 @@ Key visual characteristics:
 
 ### Font Families
 
-**Publico Banner** — Premium serif by Commercial Type. Used exclusively for large display headlines (h1, h2). Light weight (300) creates editorial luxury. Self-hosted as Next.js font via woff2 files. Fallback: `Georgia, serif`.
+**publicoBanner** — Premium serif by Commercial Type. Self-hosted as Next.js woff2 font, exposed via `--font-publico-banner` CSS variable. Available weights: 300, 400, 500, 700, 800, 900. Used exclusively for large display headlines (h1, h2). Light weight (300) creates editorial luxury. Fallback: `Georgia, serif`.
 
-**Artlist Sans** — Proprietary grotesque commissioned for the brand. Loaded via `--font-artlist-sans` CSS variable. Used for all UI chrome: body, buttons, nav, labels. Fallback: `sans-serif`.
+**artlistSans** — Proprietary grotesque commissioned for the brand. Self-hosted as Next.js woff2 font, exposed via `--font-artlist-sans` CSS variable. Available weights: 100, 300, 400, 500, 600, 700, 900. Used for all UI chrome: body, buttons, nav, labels, captions. Fallback: `sans-serif`.
 
 ### Type Hierarchy
 
 | Role | Font | Size | Weight | Line Height | Letter Spacing | Use |
 | --- | --- | --- | --- | --- | --- | --- |
-| `display-xl` | Publico Banner | 104px | 300 | 0.88 | -3.2px | Hero headline desktop |
-| `display-lg` | Publico Banner | 72px | 300 | 1.0 | -2.16px | Section hero headlines |
-| `display-md` | Publico Banner | 56px | 300 | 1.0 | -1.68px | Secondary display, large section titles |
-| `title-lg` | Artlist Sans | 28px | 500 | 1.25 | -0.28px | Card headings, modal titles |
-| `title-md` | Artlist Sans | 24px | 500 | 1.25 | -0.16px | Feature section headings, h3 |
-| `body-lg` | Artlist Sans | 18px | 400 | 1.5 | 0 | Lead paragraphs, pricing descriptions |
-| `body-md` | Artlist Sans | 16px | 400 | 1.5 | 0 | Standard body copy |
-| `body-sm` | Artlist Sans | 14px | 400 | 1.25 | 0 | Secondary body, form labels |
-| `button` | Artlist Sans | 14px | 500 | 1.75 | 0 | All button text |
-| `nav-link` | Artlist Sans | 14px | 500 | 1.25 | 0 | Navigation links |
-| `caption` | Artlist Sans | 12px | 400 | 1.0 | 0 | Badges, timestamps, metadata |
+| `display-xl` | publicoBanner | 104px | 300 | 0.88 | -3.2px | Hero headline desktop |
+| `display-lg` | publicoBanner | 72px | 300 | 1.0 | -2.16px | Section hero headlines |
+| `display-md` | publicoBanner | 56px | 300 | 1.0 | -1.68px | Secondary display, large section titles |
+| `title-lg` | artlistSans | 28px | 500 | 1.25 | -0.28px | Card headings, modal titles |
+| `title-md` | artlistSans | 24px | 500 | 1.25 | -0.16px | Feature section headings, h3 |
+| `body-lg` | artlistSans | 18px | 400 | 1.5 | 0 | Lead paragraphs, pricing descriptions |
+| `body-md` | artlistSans | 16px | 400 | 1.5 | 0 | Standard body copy |
+| `body-sm` | artlistSans | 14px | 400 | 1.25 | 0 | Secondary body, form labels |
+| `button` | artlistSans | 14px | 500 | 1.75 | 0 | All button text |
+| `nav-link` | artlistSans | 14px | 500 | 1.25 | 0 | Navigation links |
+| `caption` | artlistSans | 12px | 400 | 1.0 | 0 | Badges, timestamps, metadata |
 
 ### Typography Principles
 
-- Publico Banner is always light weight (300). Never bold display headings.
-- Negative letter-spacing is mandatory for all Publico Banner usage — scale from -1.68px at 56px to -3.2px at 104px.
-- Artlist Sans weights are 300 (light), 400 (normal), 500 (medium), 600 (semibold). Avoid 700 (bold) in UI.
+- publicoBanner is always light weight (300) for display. Never bold display headings.
+- Negative letter-spacing is mandatory for all publicoBanner usage — scale from -1.68px at 56px to -3.2px at 104px.
+- artlistSans weights used in UI: 300 (light), 400 (normal), 500 (medium), 600 (semibold). Avoid 700 (bold) in UI text.
 - Body text on dark canvas uses `#E6E6E6` (not pure white) for reduced eye strain.
-- The platform uses fluid type scaling: `clamp(3.5rem, 3.5rem + (100vw - 1024px) * 0.0535, 6.5rem)` for hero h1 between 1024px and 1920px.
+- The platform uses fluid type scaling with `clamp()` functions — e.g., `clamp(3.5rem, 3.5rem + (100vw - 1024px) * 0.0535, 6.5rem)` for hero h1 between 1024px and 1920px.
+- When self-hosting is not available, use `Georgia` for display headings and `Inter` or `DM Sans` as the closest artlistSans substitute.
 
 ---
 
@@ -351,15 +356,17 @@ Artlist uses generous whitespace to let media content breathe. Hero sections can
 
 | Level | Treatment | Example Use |
 | --- | --- | --- |
-| 0 | `canvas` (#171717) flat | Page background, hero areas |
+| -1 | `canvas-deep` (#0D0D0D) flat | Deepest hero overlays, banner backgrounds |
+| 0 | `canvas` (#171717) flat | Page background, nav drawer |
 | 1 | `surface` (#1F1F1F) + subtle inset shadow | Pricing cards, feature cards |
 | 2 | `surface-mid` (#2B2B2B) + inset light | Input fields, dropdown items |
-| 3 | MUI modal overlay (rgba(0,0,0,0.5)) | Modal backdrop |
+| 3 | MUI modal overlay (rgba(0,0,0,0.8)) | Modal backdrop |
 | 4 | `surface-elevated` (#333333) + blur | Tooltip panels, popovers |
 
 ### Shadow Philosophy
 
 Shadows serve two purposes on Artlist:
+
 1. **Inset highlights** — white inset shadows (`inset 0px 1.1px 1.1px 0px rgba(255,255,255,0.25)`) simulate a lit-from-above surface on cards, giving depth without outside drop shadows
 2. **Ambient glow** — pricing cards have `0px 8px 32px 0px rgba(0,0,0,0.15)` and hover states reveal `0 0 24px 0 rgba(255,255,255,0.12)` — a white glow that makes the card appear to lift
 
@@ -397,6 +404,7 @@ Artlist's most distinctive shape is the **full-pill button**. Every interactive 
 ### Buttons
 
 **Primary CTA (Yellow Pill):**
+
 - Background: `#FFDA2A` with glass-radial gradient overlay
 - Text: `#171717` (primary-contrast), 14px, weight 500
 - Border radius: 9999px (full pill)
@@ -404,18 +412,21 @@ Artlist's most distinctive shape is the **full-pill button**. Every interactive 
 - Hover: `#E6C426` background, brightness filter
 
 **Outlined Secondary:**
+
 - Background: transparent with frosted-glass backdrop filter
 - Text: `#FFFFFF` or `#E6E6E6`
 - Border: `1px solid rgba(255,218,42,0.5)` (yellow-tinted outline)
 - Border radius: 9999px
 
 **Ghost / Minimal:**
+
 - Background: transparent
 - Text: `#FFDA2A`
 - No border
 - Border radius: 9999px
 
 **Disabled:**
+
 - Background: `#333333` (surface-elevated)
 - Text: `#FFFFFF` (on-dark)
 - Cursor: not-allowed
@@ -423,6 +434,7 @@ Artlist's most distinctive shape is the **full-pill button**. Every interactive 
 ### Cards
 
 **Standard Feature Card:**
+
 - Background: `#1F1F1F`
 - Border: `1px solid #585454`
 - Border radius: 20px
@@ -431,14 +443,17 @@ Artlist's most distinctive shape is the **full-pill button**. Every interactive 
 - Hover: white ambient glow `0 0 24px 0 rgba(255,255,255,0.12)` + translate-y
 
 **Pricing Card:**
+
 - Background: `#171717` (same as canvas)
 - Border: `1px solid #585454`
 - Border radius: 20px
 - Padding: 36px 32px
 
 **Featured Pricing Card (Max Plan):**
-- Background: linear-gradient from `#F6D4A1` to `#ED8445` (warm amber/orange)
-- Used for the premium plan highlight treatment
+
+- Highlight stripe background: `linear-gradient(252deg, #FFEEB0 23%, #F6BF53 82%)` — pale gold to amber
+- Card body: `#1F1F1F` surface with `1px solid #FFDA2A` border
+- The gradient highlight appears as a top banner strip, not the full card face
 
 ### Inputs and Forms
 
@@ -450,6 +465,7 @@ Artlist's most distinctive shape is the **full-pill button**. Every interactive 
 - Placeholder: `#666666`
 
 Toggle/Switch:
+
 - Track off: `#C1C1C1` with `#C7C7C7` border
 - Track on: `#FFFFFF`
 - Thumb: `#171717` (dark on light track)
@@ -465,7 +481,8 @@ Toggle/Switch:
 ### Badges and Tags
 
 - Default: `#2B2B2B` background, `#E6E6E6` text, `border-radius: 9999px`
-- Success: `#54F893` background, `#171717` text, `border-radius: 200px`
+- Success (vivid): `#54F893` background, `#171717` text, `border-radius: 200px` — used for pricing checkmarks
+- Success (semantic): `#81C784` — MUI success green, used in form/state feedback
 - Error: `#CA514E` background, `#FFFFFF` text
 
 ---
@@ -473,6 +490,7 @@ Toggle/Switch:
 ## Do's and Don'ts
 
 **Do:**
+
 - Use `#FFDA2A` exclusively as the single accent color — do not introduce secondary accent colors
 - Apply Publico Banner (weight 300) for all display headlines with significant negative letter-spacing
 - Use full-pill (`border-radius: 9999px`) for every interactive button
@@ -482,6 +500,7 @@ Toggle/Switch:
 - Apply white inset shadows on cards to simulate dimensionality on dark surfaces
 
 **Don't:**
+
 - Don't use Publico Banner at weights other than 300 for display text
 - Don't use rectangular or mildly rounded buttons — the brand identity is full-pill only
 - Don't place yellow `#FFDA2A` text directly on white backgrounds — it fails contrast
@@ -531,29 +550,35 @@ Toggle/Switch:
 ## Agent Prompt Guide
 
 ### Quick Color Reference
+
 - Primary accent (yellow): `#FFDA2A`
-- Canvas (dark background): `#171717`
+- Primary hover (dark yellow): `#E6C426`
+- Primary contrast (text on yellow): `#171717`
+- Canvas deep (darkest bg): `#0D0D0D`
+- Canvas (page background): `#171717`
 - Surface (elevated card): `#1F1F1F`
 - Surface mid (inputs): `#2B2B2B`
+- Surface elevated (tooltips): `#333333`
 - Ink (white text): `#FFFFFF`
 - Body (light gray text): `#E6E6E6`
 - Muted (secondary text): `#B2B2B2`
-- Hairline (borders): `#333333` / `#585454`
-- Success (green): `#54F893`
+- Subtle (disabled/placeholder): `#666666`
+- Hairline (card borders): `#4D4D4D`
+- Success vivid (pricing checks): `#54F893`
+- Success semantic (MUI): `#81C784`
 - Error: `#CA514E`
-- Primary contrast (text on yellow): `#171717`
-- Primary active (yellow hover): `#E6C426`
+- Max plan gold: `#F6BF53` → `#FFEEB0` (gradient)
 
 ### Example Component Prompts
 
 **Hero Section:**
-"Create a hero section on `#171717` dark canvas. Full-width, full-screen height. Headline: Publico Banner, weight 300, 72–104px fluid, `#FFFFFF`, letter-spacing -2.5px, line-height 0.88. Subheadline: Artlist Sans, 18px, weight 400, `#E6E6E6`. Primary CTA button: `#FFDA2A` background, `#171717` text, 14px weight 500, full-pill border-radius 9999px, padding 14px 32px. Optional: full-bleed video background with dark gradient overlay from left."
+"Create a hero section on `#171717` dark canvas. Full-width, full-screen height. Headline: publicoBanner, weight 300, 72–104px fluid, `#FFFFFF`, letter-spacing -2.5px, line-height 0.88. Subheadline: artlistSans, 18px, weight 400, `#E6E6E6`. Primary CTA button: `#FFDA2A` background, `#171717` text, 14px weight 500, full-pill border-radius 9999px, padding 14px 32px. Optional: full-bleed video background with dark gradient overlay `linear-gradient(90deg, #0D0D0D 20%, transparent 53%)`."
 
 **Pricing Card:**
-"Create a pricing card on `#171717` background, border `1px solid #585454`, border-radius 20px, padding 36px 32px. Plan name in Artlist Sans 14px weight 500 `#B2B2B2` uppercase. Price in Artlist Sans 40px weight 600 `#FFFFFF`. Feature list with `#54F893` check mark icons and `#E6E6E6` text 14px. CTA button: full-width, `#FFDA2A`, `#171717` text, full-pill, padding 14px."
+"Create a pricing card on `#171717` background, border `1px solid #4D4D4D`, border-radius 20px, padding 36px 32px. Plan name in artlistSans 14px weight 500 `#B2B2B2` uppercase. Price in artlistSans 40px weight 600 `#FFFFFF`. Feature list with `#54F893` check mark icons and `#E6E6E6` text 14px. CTA button: full-width, `#FFDA2A`, `#171717` text, full-pill, padding 14px. For the Max plan featured card, add a top highlight stripe with `linear-gradient(252deg, #FFEEB0 23%, #F6BF53 82%)`."
 
 **Button Set:**
-"Primary button: `#FFDA2A` background, `#171717` text, border-radius 9999px, padding 14px 32px, Artlist Sans 14px weight 500, no border. Secondary button: transparent background, `1px solid rgba(255,218,42,0.5)` border, `#FFFFFF` text, same radius and padding. Ghost button: transparent, no border, `#FFDA2A` text."
+"Primary button: `#FFDA2A` background, `#171717` text, border-radius 9999px, padding 14px 32px, artlistSans 14px weight 500, no border. Secondary button: transparent background, `1px solid rgba(255,218,42,0.5)` border, `#FFFFFF` text, same radius and padding. Ghost button: transparent, no border, `#FFDA2A` text."
 
 **Navigation Bar:**
 "Create a sticky navbar on `#171717` background, no border. Left: Artlist wordmark in yellow. Center: nav links in Artlist Sans 14px weight 500 `#B2B2B2`, hover `#FFFFFF`. Right: primary-yellow pill button 'Start Free Now' with `#171717` text."
@@ -562,6 +587,7 @@ Toggle/Switch:
 "Create a feature card on `#1F1F1F` background, border `1px solid #585454`, border-radius 20px, padding 28px. Box-shadow: `inset 0px 1.1px 1.1px 0px rgba(255,255,255,0.25)`. Title in Artlist Sans 20px weight 500 `#FFFFFF`. Body in Artlist Sans 14px weight 400 `#B2B2B2`. Hover: white ambient glow `box-shadow: 0 0 24px 0 rgba(255,255,255,0.12)`."
 
 ### Iteration Guide
+
 1. Set the page background to `#171717` — never a lighter gray for Artlist UI
 2. Load Publico Banner (weight 300) from CDN or self-hosted woff2 for all display headings; use Georgia as fallback
 3. Load Artlist Sans (or a geometric grotesque like Inter as a close substitute) for all UI text
