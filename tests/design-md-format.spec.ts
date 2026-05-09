@@ -6,6 +6,8 @@ import yaml from 'js-yaml';
 const HEX_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 const PX_RE = /^\d+(\.\d+)?px$/;
 const TOKEN_REF_RE = /\{([^}]+)\}/g;
+// Valid token path: "section.token-name" — only lowercase, digits, hyphens, one dot separator
+const TOKEN_PATH_RE = /^[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*(-[a-z0-9]+)*$/;
 
 interface DesignMdFile {
   hasFrontmatter: boolean;
@@ -27,7 +29,7 @@ function flattenTokenKeys(obj: unknown, prefix = ''): string[] {
   return Object.entries(obj as Record<string, unknown>).flatMap(([k, v]) => {
     const key = prefix ? `${prefix}.${k}` : k;
     return typeof v === 'object' && v !== null && !Array.isArray(v)
-      ? flattenTokenKeys(v, key)
+      ? [key, ...flattenTokenKeys(v, key)]
       : [key];
   });
 }
@@ -122,7 +124,7 @@ for (const filePath of yamlFiles) {
     if (!components) return;
     const allKeys = flattenTokenKeys(frontmatter);
     const componentStr = JSON.stringify(components);
-    const refs = [...componentStr.matchAll(TOKEN_REF_RE)].map(m => m[1]);
+    const refs = [...componentStr.matchAll(TOKEN_REF_RE)].map(m => m[1]).filter(r => TOKEN_PATH_RE.test(r));
     for (const ref of refs) {
       expect(allKeys, `token reference "{${ref}}" does not resolve`).toContain(ref);
     }

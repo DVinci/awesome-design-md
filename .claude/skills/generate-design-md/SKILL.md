@@ -174,6 +174,8 @@ After collecting all page results, note:
 
 **RGB to hex:** Convert `rgb(R, G, B)` → `#RRGGBB`. Use uppercase hex. Round values.
 
+**RGBA to 8-digit hex:** Convert `rgba(R, G, B, A)` → `#RRGGBBAA` where `AA = round(A × 255)` in uppercase hex. Example: `rgba(255, 255, 255, 0.1)` → `#FFFFFF1A`. Never write `rgba()` strings as color token values — the format validator requires strict hex.
+
 **Semantic naming** — assign these names based on role and frequency:
 
 | Role | Token name |
@@ -304,7 +306,13 @@ components:
 
 Add `badge`, `badge-primary`, `pricing-card`, `pricing-card-featured` if data exists.
 
-Use `{colors.X}`, `{typography.X}`, `{spacing.X}`, `{rounded.X}` token references — **never hardcode hex values in components**.
+**Component value rules — strictly follow these:**
+- Token references `{colors.X}`, `{typography.X}`, `{spacing.X}`, `{rounded.X}` — preferred for all semantic values
+- Plain px strings `"10px 16px"` — allowed for padding/size shorthand
+- Literal `"none"` or `"transparent"` — allowed
+- A plain hex string `"#RRGGBB"` — only if no matching token exists
+
+**Never use CSS functions in component values:** No `linear-gradient(...)`, no `rgba(...)`, no `calc()`. If a site uses gradient buttons, document the gradient in the markdown Components section but use the nearest solid color token (`{colors.primary}`) in the YAML block. The format validator checks that every `{X.Y}` reference in components resolves to a defined token path.
 
 ---
 
