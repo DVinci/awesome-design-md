@@ -5,6 +5,9 @@
  * Then open: http://localhost:4242/viewer/
  */
 
+// ── Stale-fetch guard ──────────────────────────────────────────────────────
+let loadSeq = 0;
+
 // ── Intersection Observer for active nav links ─────────────────────────────
 const sectionIds = [
   'colors', 'typography', 'buttons', 'badges',
@@ -114,15 +117,18 @@ function populateBrandSelect(brands) {
 
 // ── loadBrand ──────────────────────────────────────────────────────────────
 export async function loadBrand(slug) {
+  const seq = ++loadSeq;
   try {
     const res = await fetch(`../design-md/${slug}/DESIGN.md`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
+    if (seq !== loadSeq) return; // stale — a newer load started
     const tokens = parseFrontmatter(text);
     const resolved = resolveTokens(tokens);
     applyTheme(resolved);
     render(resolved);
   } catch (err) {
+    if (seq !== loadSeq) return; // stale
     console.error(`[viewer] Failed to load brand "${slug}":`, err);
     const hero = document.getElementById('brand-hero');
     hero.innerHTML = `<div class="hero-empty"><strong>Error loading "${escapeHtml(slug)}"</strong>${escapeHtml(err.message)}</div>`;
@@ -224,17 +230,21 @@ export function applyTheme(tokens) {
 
   css += '}\n\n';
 
-  // Dark mode overrides — swap canvas/ink/body to dark-mode equivalents
+  // Dark mode overrides — swap canvas/ink/body/surface to dark-mode equivalents
   const c = tokens.colors ?? {};
-  const darkCanvas = c['surface']  ?? c['canvas']  ?? null;
-  const darkInk    = c['on-dark']  ?? c['ink']     ?? null;
-  const darkBody   = c['on-dark']  ?? c['body']    ?? null;
+  const darkCanvas    = c['canvas']      ?? null;
+  const darkSurface   = c['surface']     ?? c['surface-mid'] ?? c['surface-1'] ?? null;
+  const darkInk       = c['ink']         ?? c['on-dark']     ?? null;
+  const darkBody      = c['on-dark']     ?? c['body']        ?? null;
 
-  if (darkCanvas || darkInk || darkBody) {
+  // Always emit body.dark block when we have dark-surface tokens so the
+  // component demos actually use dark backgrounds in dark mode.
+  if (darkCanvas || darkSurface || darkInk || darkBody) {
     css += 'body.dark {\n';
-    if (darkCanvas && c['surface'])  css += `  --color-canvas: ${cssValue(darkCanvas)};\n`;
-    if (darkInk    && c['on-dark'])  css += `  --color-ink: ${cssValue(darkInk)};\n`;
-    if (darkBody   && c['on-dark'])  css += `  --color-body: ${cssValue(darkBody)};\n`;
+    if (darkCanvas)  css += `  --color-canvas: ${cssValue(darkCanvas)};\n`;
+    if (darkSurface) css += `  --color-surface: ${cssValue(darkSurface)};\n`;
+    if (darkInk)     css += `  --color-ink: ${cssValue(darkInk)};\n`;
+    if (darkBody)    css += `  --color-body: ${cssValue(darkBody)};\n`;
     css += '}\n';
   }
 
@@ -262,21 +272,20 @@ function cssValue(v) {
 export function render(tokens) {
   renderHero(tokens);
 
-  // Update section headings and add placeholder content
-  const sectionLabels = {
-    colors:     'Colors',
-    typography: 'Typography',
-    buttons:    'Buttons',
-    badges:     'Badges',
-    forms:      'Forms',
-    cards:      'Cards',
-    panels:     'Panels',
-    datatable:  'Data Table',
-    navigation: 'Navigation',
-    spacing:    'Spacing',
+  const sections = {
+    colors:     { label: 'Colors',     fn: renderColors },
+    typography: { label: 'Typography', fn: renderTypography },
+    buttons:    { label: 'Buttons',    fn: renderButtons },
+    badges:     { label: 'Badges',     fn: renderBadges },
+    forms:      { label: 'Forms',      fn: renderForms },
+    cards:      { label: 'Cards',      fn: renderCards },
+    panels:     { label: 'Panels',     fn: renderPanels },
+    datatable:  { label: 'Data Table', fn: renderDataTable },
+    navigation: { label: 'Navigation', fn: renderNavigation },
+    spacing:    { label: 'Spacing',    fn: renderSpacing },
   };
 
-  for (const [id, label] of Object.entries(sectionLabels)) {
+  for (const [id, { label, fn }] of Object.entries(sections)) {
     const section = document.getElementById(id);
     if (!section) continue;
 
@@ -287,11 +296,500 @@ export function render(tokens) {
       section.appendChild(inner);
     }
 
-    inner.innerHTML = `
-      <h2>${label}</h2>
-      <p class="placeholder">Coming in next task</p>
-    `;
+    inner.innerHTML = `<h2>${label}</h2>` + fn(tokens);
   }
+}
+
+// ── resolveOrEmpty ─────────────────────────────────────────────────────────
+/** Return value if it looks resolved, or '' if it still contains {…} refs */
+function resolveOrEmpty(val) {
+  if (val == null) return '';
+  const s = String(val);
+  return s.includes('{') ? '' : s;
+}
+
+// ── renderColors ───────────────────────────────────────────────────────────
+function renderColors(tokens) {
+  const colors = tokens.colors;
+  if (!colors || typeof colors !== 'object' || !Object.keys(colors).length) {
+    return '<p class="placeholder">No colors defined.</p>';
+  }
+
+  const swatches = Object.entries(colors).map(([name, value]) => {
+    const safeVal  = resolveOrEmpty(value) || '#cccccc';
+    const safeName = escapeHtml(name);
+    const safeHex  = escapeHtml(safeVal);
+    return `
+      <div class="swatch-item" onclick="navigator.clipboard.writeText('${safeHex}').then(()=>{const t=this.querySelector('.swatch-tooltip');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1200)})" title="Click to copy ${safeHex}">
+        <div class="swatch-box" style="background:${safeHex}"></div>
+        <span class="swatch-name">${safeName}</span>
+        <span class="swatch-hex">${safeHex}</span>
+        <span class="swatch-tooltip">Copied!</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <style>
+      .swatch-grid { display:flex; flex-wrap:wrap; gap:12px; }
+      .swatch-item { position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; width:96px; }
+      .swatch-box  { width:80px; height:56px; border-radius:var(--rounded-md,8px); border:1px solid rgba(128,128,128,0.15); transition:transform 0.1s; }
+      .swatch-item:hover .swatch-box { transform:scale(1.06); }
+      .swatch-name { font-size:11px; font-weight:600; color:var(--ui-text); text-align:center; word-break:break-all; }
+      .swatch-hex  { font-size:10px; color:var(--ui-text-muted); font-family:monospace; }
+      .swatch-tooltip { position:absolute; top:-28px; left:50%; transform:translateX(-50%); background:#333; color:#fff; font-size:10px; padding:2px 8px; border-radius:4px; opacity:0; pointer-events:none; transition:opacity 0.2s; white-space:nowrap; }
+      .swatch-tooltip.show { opacity:1; }
+    </style>
+    <div class="swatch-grid">${swatches}</div>`;
+}
+
+// ── renderTypography ───────────────────────────────────────────────────────
+function renderTypography(tokens) {
+  const typo = tokens.typography;
+  if (!typo || typeof typo !== 'object' || !Object.keys(typo).length) {
+    return '<p class="placeholder">No typography defined.</p>';
+  }
+
+  const rows = Object.entries(typo).map(([role, props]) => {
+    if (!props || typeof props !== 'object') return '';
+    const family  = resolveOrEmpty(props.fontFamily)    || 'inherit';
+    const size     = resolveOrEmpty(props.fontSize)      || '16px';
+    const weight   = resolveOrEmpty(props.fontWeight)    || '400';
+    const lh       = resolveOrEmpty(props.lineHeight)    || '1.5';
+    const ls       = resolveOrEmpty(props.letterSpacing) || '0';
+
+    const meta = [size, weight, lh !== '1.5' ? `lh ${lh}` : '', ls !== '0' ? ls : ''].filter(Boolean).join(' · ');
+    const inlineStyle = `font-family:${cssValue(family)};font-size:${cssValue(size)};font-weight:${cssValue(weight)};line-height:${cssValue(lh)};letter-spacing:${cssValue(ls)};`;
+
+    return `
+      <tr class="typo-row">
+        <td class="typo-role">${escapeHtml(role)}</td>
+        <td class="typo-sample" style="${inlineStyle}">The quick brown fox jumps over the lazy dog</td>
+        <td class="typo-meta">${escapeHtml(meta)}</td>
+      </tr>`;
+  }).join('');
+
+  return `
+    <style>
+      .typo-table { width:100%; border-collapse:collapse; }
+      .typo-row + .typo-row td { border-top:1px solid var(--ui-border); }
+      .typo-role { width:130px; vertical-align:top; padding:14px 8px 14px 0; font-size:11px; font-weight:600; color:var(--ui-text-muted); font-family:monospace; white-space:nowrap; }
+      .typo-sample { padding:14px 16px; color:var(--ui-heading,var(--ui-text)); overflow:hidden; text-overflow:ellipsis; max-width:420px; }
+      .typo-meta { width:160px; vertical-align:top; padding:14px 0 14px 8px; font-size:11px; color:var(--ui-text-muted); font-family:monospace; white-space:nowrap; text-align:right; }
+    </style>
+    <table class="typo-table"><tbody>${rows}</tbody></table>`;
+}
+
+// ── renderButtons ──────────────────────────────────────────────────────────
+function renderButtons(tokens) {
+  const comps = tokens.components ?? {};
+  const entries = Object.entries(comps).filter(([k]) => k.startsWith('button-'));
+
+  if (!entries.length) {
+    return '<p class="placeholder">No button-* components defined.</p>';
+  }
+
+  const buttons = entries.map(([key, comp]) => {
+    if (!comp || typeof comp !== 'object') return '';
+    const bg     = resolveOrEmpty(comp.backgroundColor) || resolveOrEmpty(comp.background) || 'var(--color-primary,#6366f1)';
+    const fg     = resolveOrEmpty(comp.textColor)       || resolveOrEmpty(comp.color)      || '#ffffff';
+    const radius = resolveOrEmpty(comp.rounded)         || resolveOrEmpty(comp.borderRadius)|| '6px';
+    const pad    = resolveOrEmpty(comp.padding)                                             || '8px 16px';
+    const border = resolveOrEmpty(comp.border)          || 'none';
+    const fontSize = resolveOrEmpty(comp.fontSize)      || '14px';
+
+    const style = `background:${cssValue(bg)};color:${cssValue(fg)};border-radius:${cssValue(radius)};padding:${cssValue(pad)};border:${cssValue(border)};font-size:${cssValue(fontSize)};font-family:inherit;cursor:pointer;`;
+    return `
+      <div class="btn-demo-item">
+        <button style="${style}">${escapeHtml(key)}</button>
+        <span class="btn-demo-label">${escapeHtml(key)}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <style>
+      .btn-demo-row { display:flex; flex-wrap:wrap; gap:20px; align-items:flex-end; }
+      .btn-demo-item { display:flex; flex-direction:column; align-items:center; gap:8px; }
+      .btn-demo-label { font-size:10px; color:var(--ui-text-muted); font-family:monospace; }
+    </style>
+    <div class="btn-demo-row">${buttons}</div>`;
+}
+
+// ── renderBadges ───────────────────────────────────────────────────────────
+function renderBadges(tokens) {
+  const comps   = tokens.components ?? {};
+  const prefixes = ['badge-', 'chip-', 'label-', 'pill-', 'tag-'];
+  const entries  = Object.entries(comps).filter(([k]) => prefixes.some(p => k.startsWith(p)));
+
+  if (!entries.length) {
+    return '<p class="placeholder">No badge-*, chip-*, label-*, pill-*, or tag-* components defined.</p>';
+  }
+
+  const badges = entries.map(([key, comp]) => {
+    if (!comp || typeof comp !== 'object') return '';
+    const bg     = resolveOrEmpty(comp.backgroundColor) || resolveOrEmpty(comp.background) || 'var(--ui-border)';
+    const fg     = resolveOrEmpty(comp.textColor)       || resolveOrEmpty(comp.color)      || 'var(--ui-text)';
+    const radius = resolveOrEmpty(comp.rounded)         || resolveOrEmpty(comp.borderRadius)|| '4px';
+    const pad    = resolveOrEmpty(comp.padding)                                             || '2px 8px';
+    const border = resolveOrEmpty(comp.border)          || 'none';
+    const fontSize = resolveOrEmpty(comp.fontSize)      || '12px';
+
+    const style = `background:${cssValue(bg)};color:${cssValue(fg)};border-radius:${cssValue(radius)};padding:${cssValue(pad)};border:${cssValue(border)};font-size:${cssValue(fontSize)};display:inline-block;font-family:inherit;`;
+    return `
+      <div class="badge-demo-item">
+        <span style="${style}">${escapeHtml(key)}</span>
+        <span class="badge-demo-label">${escapeHtml(key)}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <style>
+      .badge-demo-row { display:flex; flex-wrap:wrap; gap:20px; align-items:flex-end; }
+      .badge-demo-item { display:flex; flex-direction:column; align-items:center; gap:8px; }
+      .badge-demo-label { font-size:10px; color:var(--ui-text-muted); font-family:monospace; }
+    </style>
+    <div class="badge-demo-row">${badges}</div>`;
+}
+
+// ── renderForms ────────────────────────────────────────────────────────────
+function renderForms(tokens) {
+  const comps = tokens.components ?? {};
+  const colors = tokens.colors    ?? {};
+
+  const inputDef      = comps['text-input']          ?? {};
+  const inputFocused  = comps['text-input-focused']  ?? {};
+  const btnPrimary    = comps['button-primary']       ?? {};
+  const errorColor    = resolveOrEmpty(colors['error']) || resolveOrEmpty(colors['warning-red']) || '#ff453a';
+
+  const defBg  = resolveOrEmpty(inputDef.backgroundColor)    || 'var(--ui-bg)';
+  const defFg  = resolveOrEmpty(inputDef.textColor)          || 'var(--ui-text)';
+  const defRad = resolveOrEmpty(inputDef.rounded)            || '6px';
+  const defPad = resolveOrEmpty(inputDef.padding)            || '8px 12px';
+
+  const focusBg     = resolveOrEmpty(inputFocused.backgroundColor) || defBg;
+  const focusBorder = resolveOrEmpty(colors['primary'])             || 'var(--color-primary,#6366f1)';
+
+  const btnBg  = resolveOrEmpty(btnPrimary.backgroundColor) || 'var(--color-primary,#6366f1)';
+  const btnFg  = resolveOrEmpty(btnPrimary.textColor)       || '#ffffff';
+  const btnRad = resolveOrEmpty(btnPrimary.rounded)         || '6px';
+  const btnPad = resolveOrEmpty(btnPrimary.padding)         || '8px 16px';
+
+  const baseInputStyle    = `background:${cssValue(defBg)};color:${cssValue(defFg)};border-radius:${cssValue(defRad)};padding:${cssValue(defPad)};border:1px solid var(--ui-border);font-family:inherit;font-size:14px;width:100%;box-sizing:border-box;`;
+  const focusedInputStyle = `background:${cssValue(focusBg)};color:${cssValue(defFg)};border-radius:${cssValue(defRad)};padding:${cssValue(defPad)};border:2px solid ${cssValue(focusBorder)};font-family:inherit;font-size:14px;width:100%;box-sizing:border-box;outline:none;`;
+  const errorInputStyle   = `background:${cssValue(defBg)};color:${cssValue(defFg)};border-radius:${cssValue(defRad)};padding:${cssValue(defPad)};border:2px solid ${cssValue(errorColor)};font-family:inherit;font-size:14px;width:100%;box-sizing:border-box;`;
+  const btnStyle          = `background:${cssValue(btnBg)};color:${cssValue(btnFg)};border-radius:${cssValue(btnRad)};padding:${cssValue(btnPad)};border:none;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;`;
+
+  return `
+    <style>
+      .form-demo { max-width:480px; display:flex; flex-direction:column; gap:18px; }
+      .form-field { display:flex; flex-direction:column; gap:5px; }
+      .form-label { font-size:12px; font-weight:600; color:var(--ui-text-muted); }
+      .form-error-msg { font-size:11px; color:${cssValue(errorColor)}; }
+      .form-row { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--ui-text); }
+      .form-row input[type=checkbox], .form-row input[type=radio] { width:16px; height:16px; accent-color:${cssValue(focusBorder)}; }
+    </style>
+    <div class="form-demo">
+      <div class="form-field">
+        <label class="form-label">Text input (default)</label>
+        <input type="text" style="${baseInputStyle}" placeholder="Enter value…" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Text input (focused)</label>
+        <input type="text" style="${focusedInputStyle}" value="Focused state" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Text input (error)</label>
+        <input type="text" style="${errorInputStyle}" value="Invalid entry" />
+        <span class="form-error-msg">This field is required.</span>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Textarea</label>
+        <textarea style="${baseInputStyle} resize:vertical;height:80px;" placeholder="Write something…"></textarea>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Select dropdown</label>
+        <select style="${baseInputStyle}">
+          <option>Option A</option>
+          <option>Option B</option>
+          <option>Option C</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Checkboxes</label>
+        <div class="form-row"><input type="checkbox" checked /> Checked option</div>
+        <div class="form-row"><input type="checkbox" /> Unchecked option</div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Radio buttons</label>
+        <div class="form-row"><input type="radio" name="r1" checked /> Option one</div>
+        <div class="form-row"><input type="radio" name="r1" /> Option two</div>
+      </div>
+      <div>
+        <button style="${btnStyle}">Submit</button>
+      </div>
+    </div>`;
+}
+
+// ── renderCards ────────────────────────────────────────────────────────────
+function renderCards(tokens) {
+  const comps  = tokens.components ?? {};
+  const colors = tokens.colors     ?? {};
+  const rounded = tokens.rounded   ?? {};
+
+  // Find best card component token
+  const cardComp = comps['product-card'] ?? comps['feature-card']
+    ?? Object.entries(comps).find(([k]) => k.startsWith('card-') || k.endsWith('-card'))?.[1]
+    ?? null;
+
+  const primary  = resolveOrEmpty(colors['primary'])   || 'var(--color-primary,#6366f1)';
+  const cardBg   = cardComp ? (resolveOrEmpty(cardComp.backgroundColor) || 'var(--ui-card)') : 'var(--ui-card)';
+  const cardFg   = cardComp ? (resolveOrEmpty(cardComp.textColor)       || 'var(--ui-text)') : 'var(--ui-text)';
+  const cardRad  = cardComp ? (resolveOrEmpty(cardComp.rounded) || resolveOrEmpty(rounded['lg']) || '12px') : (resolveOrEmpty(rounded['lg']) || '12px');
+  const cardPad  = cardComp ? (resolveOrEmpty(cardComp.padding) || '20px') : '20px';
+
+  const btnBg  = resolveOrEmpty((comps['button-primary'] ?? {}).backgroundColor) || primary;
+  const btnFg  = resolveOrEmpty((comps['button-primary'] ?? {}).textColor)       || '#ffffff';
+  const btnRad = resolveOrEmpty((comps['button-primary'] ?? {}).rounded)         || '6px';
+
+  const cardStyle   = `background:${cssValue(cardBg)};color:${cssValue(cardFg)};border-radius:${cssValue(cardRad)};border:1px solid var(--ui-border);overflow:hidden;`;
+  const btnStyle    = `background:${cssValue(btnBg)};color:${cssValue(btnFg)};border-radius:${cssValue(btnRad)};padding:6px 14px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;`;
+  const imgGradient = `linear-gradient(135deg, ${cssValue(primary)}44 0%, ${cssValue(primary)} 100%)`;
+
+  const mockCards = [
+    { tag: 'Featured', title: 'Design System Viewer', desc: 'Explore brand tokens, typography, color palettes, and components in one place.' },
+    { tag: 'New', title: 'Token Resolution', desc: 'Dynamic {colors.primary} references resolve to live values from the frontmatter.' },
+    { tag: 'Component', title: 'Dark Mode Support', desc: 'Surface and ink tokens adapt automatically when dark mode is toggled on.' },
+  ];
+
+  const cardEls = mockCards.map(({ tag, title, desc }) => `
+    <div style="${cardStyle}">
+      <div style="height:140px;background:${imgGradient};display:flex;align-items:center;justify-content:center;font-size:32px;color:rgba(255,255,255,0.5);">◈</div>
+      <div style="padding:${cssValue(cardPad)}">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:${cssValue(primary)};margin-bottom:8px;">${escapeHtml(tag)}</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:8px;color:var(--ui-heading,${cssValue(cardFg)});">${escapeHtml(title)}</div>
+        <div style="font-size:13px;color:var(--ui-text-muted);line-height:1.5;margin-bottom:16px;">${escapeHtml(desc)}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:15px;font-weight:700;color:${cssValue(primary)};">Free</span>
+          <button style="${btnStyle}">View</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  return `
+    <style>
+      .cards-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+      @media(max-width:800px){ .cards-grid{ grid-template-columns:1fr 1fr; } }
+      @media(max-width:520px){ .cards-grid{ grid-template-columns:1fr; } }
+    </style>
+    <div class="cards-grid">${cardEls}</div>`;
+}
+
+// ── renderPanels ───────────────────────────────────────────────────────────
+function renderPanels(tokens) {
+  const c = tokens.colors ?? {};
+
+  const panels = [
+    {
+      type: 'info',
+      icon: 'ℹ',
+      title: 'Informational',
+      body: 'This message provides context or guidance. No action required.',
+      color: resolveOrEmpty(c['primary']) || resolveOrEmpty(c['accent-blue']) || '#3b82f6',
+      bgAlpha: 0.08,
+    },
+    {
+      type: 'success',
+      icon: '✓',
+      title: 'Success',
+      body: 'Your changes have been saved. Everything looks great.',
+      color: resolveOrEmpty(c['success']) || resolveOrEmpty(c['semantic-success']) || '#34c759',
+      bgAlpha: 0.08,
+    },
+    {
+      type: 'warning',
+      icon: '⚠',
+      title: 'Warning',
+      body: 'Review this before proceeding. Some fields require attention.',
+      color: resolveOrEmpty(c['warning']) || resolveOrEmpty(c['semantic-warning']) || '#ff9f0a',
+      bgAlpha: 0.08,
+    },
+    {
+      type: 'error',
+      icon: '✕',
+      title: 'Error',
+      body: 'Something went wrong. Please check your input and try again.',
+      color: resolveOrEmpty(c['error']) || resolveOrEmpty(c['warning-red']) || resolveOrEmpty(c['danger']) || '#ff453a',
+      bgAlpha: 0.1,
+    },
+  ];
+
+  const panelEls = panels.map(({ icon, title, body, color }) => {
+    // Build a semi-transparent background using hex color where possible
+    const bg = color.startsWith('#') && color.length === 7
+      ? color + Math.round(0.1 * 255).toString(16).padStart(2, '0')
+      : `rgba(128,128,128,0.08)`;
+    const borderColor = color.startsWith('#') ? color + '55' : 'rgba(128,128,128,0.2)';
+
+    return `
+      <div style="display:flex;gap:14px;padding:16px 18px;border-radius:var(--rounded-md,8px);border:1px solid ${escapeHtml(borderColor)};background:${escapeHtml(bg)};margin-bottom:12px;">
+        <span style="font-size:20px;color:${escapeHtml(color)};flex-shrink:0;line-height:1.4;">${icon}</span>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:${escapeHtml(color)};margin-bottom:4px;">${escapeHtml(title)}</div>
+          <div style="font-size:13px;color:var(--ui-text);line-height:1.5;">${escapeHtml(body)}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `<div class="panels-stack">${panelEls}</div>`;
+}
+
+// ── renderDataTable ────────────────────────────────────────────────────────
+function renderDataTable(tokens) {
+  const comps   = tokens.components ?? {};
+  const colors  = tokens.colors    ?? {};
+
+  const primary  = resolveOrEmpty(colors['primary']) || 'var(--color-primary,#6366f1)';
+  const inputDef = comps['text-input'] ?? {};
+  const defBg    = resolveOrEmpty(inputDef.backgroundColor) || 'var(--ui-bg)';
+  const defFg    = resolveOrEmpty(inputDef.textColor)       || 'var(--ui-text)';
+  const defRad   = resolveOrEmpty(inputDef.rounded)         || '6px';
+  const defPad   = resolveOrEmpty(inputDef.padding)         || '8px 12px';
+
+  const searchStyle = `background:${cssValue(defBg)};color:${cssValue(defFg)};border-radius:${cssValue(defRad)};padding:${cssValue(defPad)};border:1px solid var(--ui-border);font-family:inherit;font-size:13px;width:260px;`;
+
+  const statusColors = {
+    Active:   resolveOrEmpty(colors['success']) || resolveOrEmpty(colors['semantic-success']) || '#34c759',
+    Draft:    resolveOrEmpty(colors['warning']) || '#ff9f0a',
+    Archived: 'var(--ui-text-muted)',
+  };
+
+  const brandName = escapeHtml(tokens.name ?? 'Brand');
+  const primaryHex = resolveOrEmpty(colors['primary']) || '#6366f1';
+
+  const rows = [
+    { name: brandName,   type: 'Marketing', color: primaryHex,  components: '12', status: 'Active' },
+    { name: 'Acme Corp', type: 'SaaS',      color: '#10b981',    components: '8',  status: 'Active' },
+    { name: 'Axiom',     type: 'Analytics', color: '#f59e0b',    components: '5',  status: 'Draft' },
+    { name: 'Prism',     type: 'Fintech',   color: '#8b5cf6',    components: '3',  status: 'Draft' },
+    { name: 'Legacy UI', type: 'Enterprise',color: '#6b7280',    components: '21', status: 'Archived' },
+  ];
+
+  const tableRows = rows.map((row, i) => {
+    const sc = statusColors[row.status] || 'var(--ui-text-muted)';
+    const scBg = sc.startsWith('#') ? sc + '22' : 'rgba(128,128,128,0.1)';
+    return `
+      <tr class="dt-row" style="${i % 2 === 1 ? 'background:rgba(128,128,128,0.04);' : ''}">
+        <td>${escapeHtml(row.name)}</td>
+        <td>${escapeHtml(row.type)}</td>
+        <td><span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;border-radius:50%;background:${escapeHtml(row.color)};display:inline-block;"></span>${escapeHtml(row.color)}</span></td>
+        <td>${escapeHtml(row.components)}</td>
+        <td><span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${escapeHtml(scBg)};color:${escapeHtml(sc)};">${escapeHtml(row.status)}</span></td>
+        <td><a href="#" style="color:${cssValue(primary)};text-decoration:none;font-size:12px;" onclick="return false;">Edit</a> · <a href="#" style="color:var(--ui-text-muted);text-decoration:none;font-size:12px;" onclick="return false;">View</a></td>
+      </tr>`;
+  }).join('');
+
+  return `
+    <style>
+      .dt-wrap { overflow-x:auto; }
+      .dt-search-row { margin-bottom:14px; }
+      .dt-table { width:100%; border-collapse:collapse; font-size:13px; }
+      .dt-table th { text-align:left; padding:8px 12px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--ui-text-muted); border-bottom:2px solid var(--ui-border); }
+      .dt-row td { padding:10px 12px; border-bottom:1px solid var(--ui-border); color:var(--ui-text); vertical-align:middle; }
+      .dt-row:hover td { background:rgba(128,128,128,0.05); }
+    </style>
+    <div class="dt-wrap">
+      <div class="dt-search-row">
+        <input type="text" style="${searchStyle}" placeholder="Search design systems…" />
+      </div>
+      <table class="dt-table">
+        <thead><tr><th>Name</th><th>Type</th><th>Color</th><th>Components</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>`;
+}
+
+// ── renderNavigation ───────────────────────────────────────────────────────
+function renderNavigation(tokens) {
+  const comps  = tokens.components ?? {};
+  const colors = tokens.colors    ?? {};
+
+  // Find best nav component
+  const navComp = comps['primary-nav'] ?? comps['top-nav'] ?? comps['global-nav']
+    ?? comps['nav'] ?? comps['header'] ?? null;
+
+  const btnComp  = comps['button-primary'] ?? {};
+  const primary  = resolveOrEmpty(colors['primary']) || 'var(--color-primary,#6366f1)';
+
+  const navBg    = navComp ? (resolveOrEmpty(navComp.backgroundColor) || 'var(--ui-sidebar)') : 'var(--ui-sidebar)';
+  const navFg    = navComp ? (resolveOrEmpty(navComp.textColor)       || 'var(--ui-text)')    : 'var(--ui-text)';
+  const navH     = navComp ? (resolveOrEmpty(navComp.height)          || '56px')              : '56px';
+  const navPad   = navComp ? (resolveOrEmpty(navComp.padding)         || '0 24px')            : '0 24px';
+
+  const btnBg   = resolveOrEmpty(btnComp.backgroundColor) || primary;
+  const btnFg   = resolveOrEmpty(btnComp.textColor)       || '#ffffff';
+  const btnRad  = resolveOrEmpty(btnComp.rounded)         || '6px';
+
+  const navStyle = `background:${cssValue(navBg)};color:${cssValue(navFg)};height:${cssValue(navH)};padding:${cssValue(navPad)};display:flex;align-items:center;justify-content:space-between;border-radius:var(--rounded-md,8px);border:1px solid var(--ui-border);`;
+  const linkStyle = `font-size:14px;color:${cssValue(navFg)};text-decoration:none;padding:6px 10px;border-radius:4px;opacity:0.85;`;
+  const ctaStyle = `background:${cssValue(btnBg)};color:${cssValue(btnFg)};border-radius:${cssValue(btnRad)};padding:7px 16px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;`;
+
+  const brandName = escapeHtml(tokens.name ?? 'Brand');
+  const navLinks  = ['Product', 'Docs', 'Pricing', 'Blog', 'Company'].map(l =>
+    `<a href="#" style="${linkStyle}" onclick="return false;">${escapeHtml(l)}</a>`
+  ).join('');
+
+  return `
+    <div class="nav-demo-frame">
+      <div style="${navStyle}">
+        <div style="display:flex;align-items:center;gap:24px;">
+          <span style="font-weight:700;font-size:15px;letter-spacing:-0.02em;color:${cssValue(navFg)};">${brandName}</span>
+          <nav style="display:flex;gap:2px;">${navLinks}</nav>
+        </div>
+        <button style="${ctaStyle}">Get started</button>
+      </div>
+    </div>`;
+}
+
+// ── renderSpacing ──────────────────────────────────────────────────────────
+function renderSpacing(tokens) {
+  const spacing = tokens.spacing;
+  if (!spacing || typeof spacing !== 'object' || !Object.keys(spacing).length) {
+    return '<p class="placeholder">No spacing defined.</p>';
+  }
+
+  const primary = resolveOrEmpty((tokens.colors ?? {})['primary']) || 'var(--color-primary,#6366f1)';
+
+  // Find max raw px value for width scaling
+  const values = Object.values(spacing).map(v => {
+    const n = parseFloat(String(v));
+    return isNaN(n) ? 0 : n;
+  });
+  const maxPx = Math.max(...values, 1);
+
+  const rows = Object.entries(spacing).map(([scale, value]) => {
+    const raw  = resolveOrEmpty(value) || '0';
+    const n    = parseFloat(raw);
+    const pct  = isNaN(n) ? 0 : Math.min((n / maxPx) * 100, 100);
+
+    return `
+      <div class="spacing-row">
+        <span class="spacing-label">${escapeHtml(scale)}</span>
+        <div class="spacing-bar-track">
+          <div class="spacing-bar-fill" style="width:${pct.toFixed(1)}%;background:${cssValue(primary)};"></div>
+        </div>
+        <span class="spacing-value">${escapeHtml(raw)}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <style>
+      .spacing-list { display:flex; flex-direction:column; gap:10px; max-width:600px; }
+      .spacing-row { display:flex; align-items:center; gap:12px; }
+      .spacing-label { width:50px; font-size:12px; font-weight:600; font-family:monospace; color:var(--ui-text-muted); text-align:right; }
+      .spacing-bar-track { flex:1; height:10px; background:var(--ui-border); border-radius:5px; overflow:hidden; }
+      .spacing-bar-fill { height:100%; border-radius:5px; transition:width 0.3s; }
+      .spacing-value { width:50px; font-size:12px; font-family:monospace; color:var(--ui-text); }
+    </style>
+    <div class="spacing-list">${rows}</div>`;
 }
 
 // ── renderHero ─────────────────────────────────────────────────────────────
