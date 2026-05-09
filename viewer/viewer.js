@@ -234,7 +234,7 @@ export function applyTheme(tokens) {
   const c = tokens.colors ?? {};
   const darkCanvas    = c['canvas']      ?? null;
   const darkSurface   = c['surface']     ?? c['surface-mid'] ?? c['surface-1'] ?? null;
-  const darkInk       = c['ink']         ?? c['on-dark']     ?? null;
+  const darkInk       = c['on-dark']     ?? c['ink']         ?? null;
   const darkBody      = c['on-dark']     ?? c['body']        ?? null;
 
   // Always emit body.dark block when we have dark-surface tokens so the
@@ -297,6 +297,10 @@ export function render(tokens) {
     }
 
     inner.innerHTML = `<h2>${label}</h2>` + fn(tokens);
+
+    if (id === 'colors') {
+      setupColorSwatchListeners(inner);
+    }
   }
 }
 
@@ -320,11 +324,10 @@ function renderColors(tokens) {
     const safeName = escapeHtml(name);
     const safeHex  = escapeHtml(safeVal);
     return `
-      <div class="swatch-item" onclick="navigator.clipboard.writeText('${safeHex}').then(()=>{const t=this.querySelector('.swatch-tooltip');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1200)})" title="Click to copy ${safeHex}">
-        <div class="swatch-box" style="background:${safeHex}"></div>
+      <div class="swatch-item" title="Click to copy ${safeHex}">
+        <div class="color-swatch-box" data-color="${safeHex}" style="background:${cssValue(safeVal)}"></div>
         <span class="swatch-name">${safeName}</span>
         <span class="swatch-hex">${safeHex}</span>
-        <span class="swatch-tooltip">Copied!</span>
       </div>`;
   }).join('');
 
@@ -332,14 +335,27 @@ function renderColors(tokens) {
     <style>
       .swatch-grid { display:flex; flex-wrap:wrap; gap:12px; }
       .swatch-item { position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; width:96px; }
-      .swatch-box  { width:80px; height:56px; border-radius:var(--rounded-md,8px); border:1px solid rgba(128,128,128,0.15); transition:transform 0.1s; }
-      .swatch-item:hover .swatch-box { transform:scale(1.06); }
+      .color-swatch-box { width:80px; height:56px; border-radius:var(--rounded-md,8px); border:1px solid rgba(128,128,128,0.15); transition:transform 0.1s; position:relative; }
+      .swatch-item:hover .color-swatch-box { transform:scale(1.06); }
+      .color-swatch-box::after { content:'Copied!'; position:absolute; top:-28px; left:50%; transform:translateX(-50%); background:#333; color:#fff; font-size:10px; padding:2px 8px; border-radius:4px; opacity:0; pointer-events:none; transition:opacity 0.2s; white-space:nowrap; }
+      .color-swatch-box[data-copied]::after { opacity:1; }
       .swatch-name { font-size:11px; font-weight:600; color:var(--ui-text); text-align:center; word-break:break-all; }
       .swatch-hex  { font-size:10px; color:var(--ui-text-muted); font-family:monospace; }
-      .swatch-tooltip { position:absolute; top:-28px; left:50%; transform:translateX(-50%); background:#333; color:#fff; font-size:10px; padding:2px 8px; border-radius:4px; opacity:0; pointer-events:none; transition:opacity 0.2s; white-space:nowrap; }
-      .swatch-tooltip.show { opacity:1; }
     </style>
     <div class="swatch-grid">${swatches}</div>`;
+}
+
+// ── setupColorSwatchListeners ───────────────────────────────────────────────
+function setupColorSwatchListeners(inner) {
+  inner.querySelectorAll('.color-swatch-box').forEach(box => {
+    box.addEventListener('click', () => {
+      const hex = box.dataset.color;
+      navigator.clipboard.writeText(hex).then(() => {
+        box.setAttribute('data-copied', '');
+        setTimeout(() => box.removeAttribute('data-copied'), 1500);
+      });
+    });
+  });
 }
 
 // ── renderTypography ───────────────────────────────────────────────────────
@@ -552,7 +568,8 @@ function renderCards(tokens) {
 
   const cardStyle   = `background:${cssValue(cardBg)};color:${cssValue(cardFg)};border-radius:${cssValue(cardRad)};border:1px solid var(--ui-border);overflow:hidden;`;
   const btnStyle    = `background:${cssValue(btnBg)};color:${cssValue(btnFg)};border-radius:${cssValue(btnRad)};padding:6px 14px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;`;
-  const imgGradient = `linear-gradient(135deg, ${cssValue(primary)}44 0%, ${cssValue(primary)} 100%)`;
+  const alphaColor  = primary.startsWith('#') && primary.length === 7 ? primary + '44' : primary;
+  const imgGradient = `linear-gradient(135deg, ${cssValue(alphaColor)} 0%, ${cssValue(primary)} 100%)`;
 
   const mockCards = [
     { tag: 'Featured', title: 'Design System Viewer', desc: 'Explore brand tokens, typography, color palettes, and components in one place.' },
@@ -594,7 +611,6 @@ function renderPanels(tokens) {
       title: 'Informational',
       body: 'This message provides context or guidance. No action required.',
       color: resolveOrEmpty(c['primary']) || resolveOrEmpty(c['accent-blue']) || '#3b82f6',
-      bgAlpha: 0.08,
     },
     {
       type: 'success',
@@ -602,7 +618,6 @@ function renderPanels(tokens) {
       title: 'Success',
       body: 'Your changes have been saved. Everything looks great.',
       color: resolveOrEmpty(c['success']) || resolveOrEmpty(c['semantic-success']) || '#34c759',
-      bgAlpha: 0.08,
     },
     {
       type: 'warning',
@@ -610,7 +625,6 @@ function renderPanels(tokens) {
       title: 'Warning',
       body: 'Review this before proceeding. Some fields require attention.',
       color: resolveOrEmpty(c['warning']) || resolveOrEmpty(c['semantic-warning']) || '#ff9f0a',
-      bgAlpha: 0.08,
     },
     {
       type: 'error',
@@ -618,7 +632,6 @@ function renderPanels(tokens) {
       title: 'Error',
       body: 'Something went wrong. Please check your input and try again.',
       color: resolveOrEmpty(c['error']) || resolveOrEmpty(c['warning-red']) || resolveOrEmpty(c['danger']) || '#ff453a',
-      bgAlpha: 0.1,
     },
   ];
 
@@ -630,10 +643,10 @@ function renderPanels(tokens) {
     const borderColor = color.startsWith('#') ? color + '55' : 'rgba(128,128,128,0.2)';
 
     return `
-      <div style="display:flex;gap:14px;padding:16px 18px;border-radius:var(--rounded-md,8px);border:1px solid ${escapeHtml(borderColor)};background:${escapeHtml(bg)};margin-bottom:12px;">
-        <span style="font-size:20px;color:${escapeHtml(color)};flex-shrink:0;line-height:1.4;">${icon}</span>
+      <div style="display:flex;gap:14px;padding:16px 18px;border-radius:var(--rounded-md,8px);border:1px solid ${cssValue(borderColor)};background:${cssValue(bg)};margin-bottom:12px;">
+        <span style="font-size:20px;color:${cssValue(color)};flex-shrink:0;line-height:1.4;">${icon}</span>
         <div>
-          <div style="font-size:14px;font-weight:700;color:${escapeHtml(color)};margin-bottom:4px;">${escapeHtml(title)}</div>
+          <div style="font-size:14px;font-weight:700;color:${cssValue(color)};margin-bottom:4px;">${escapeHtml(title)}</div>
           <div style="font-size:13px;color:var(--ui-text);line-height:1.5;">${escapeHtml(body)}</div>
         </div>
       </div>`;
@@ -680,9 +693,9 @@ function renderDataTable(tokens) {
       <tr class="dt-row" style="${i % 2 === 1 ? 'background:rgba(128,128,128,0.04);' : ''}">
         <td>${escapeHtml(row.name)}</td>
         <td>${escapeHtml(row.type)}</td>
-        <td><span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;border-radius:50%;background:${escapeHtml(row.color)};display:inline-block;"></span>${escapeHtml(row.color)}</span></td>
+        <td><span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;height:14px;border-radius:50%;background:${cssValue(row.color)};display:inline-block;"></span>${escapeHtml(row.color)}</span></td>
         <td>${escapeHtml(row.components)}</td>
-        <td><span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${escapeHtml(scBg)};color:${escapeHtml(sc)};">${escapeHtml(row.status)}</span></td>
+        <td><span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${cssValue(scBg)};color:${cssValue(sc)};">${escapeHtml(row.status)}</span></td>
         <td><a href="#" style="color:${cssValue(primary)};text-decoration:none;font-size:12px;" onclick="return false;">Edit</a> · <a href="#" style="color:var(--ui-text-muted);text-decoration:none;font-size:12px;" onclick="return false;">View</a></td>
       </tr>`;
   }).join('');
