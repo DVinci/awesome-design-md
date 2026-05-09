@@ -125,7 +125,7 @@ export async function loadBrand(slug) {
   } catch (err) {
     console.error(`[viewer] Failed to load brand "${slug}":`, err);
     const hero = document.getElementById('brand-hero');
-    hero.innerHTML = `<div class="hero-empty"><strong>Error loading "${slug}"</strong>${err.message}</div>`;
+    hero.innerHTML = `<div class="hero-empty"><strong>Error loading "${escapeHtml(slug)}"</strong>${escapeHtml(err.message)}</div>`;
   }
 }
 
@@ -191,7 +191,7 @@ export function applyTheme(tokens) {
   // colors → --color-{name}
   if (tokens.colors && typeof tokens.colors === 'object') {
     for (const [name, value] of Object.entries(tokens.colors)) {
-      css += `  --color-${name}: ${value};\n`;
+      css += `  --color-${cssName(name)}: ${cssValue(value)};\n`;
     }
   }
 
@@ -200,25 +200,25 @@ export function applyTheme(tokens) {
     for (const [role, props] of Object.entries(tokens.typography)) {
       if (typeof props !== 'object' || props === null) continue;
       const r = cssName(role);
-      if (props.fontFamily)     css += `  --font-${r}-family: ${props.fontFamily};\n`;
-      if (props.fontSize)       css += `  --font-${r}-size: ${props.fontSize};\n`;
-      if (props.fontWeight)     css += `  --font-${r}-weight: ${props.fontWeight};\n`;
-      if (props.lineHeight)     css += `  --font-${r}-line-height: ${props.lineHeight};\n`;
-      if (props.letterSpacing)  css += `  --font-${r}-letter-spacing: ${props.letterSpacing};\n`;
+      if (props.fontFamily)     css += `  --font-${r}-family: ${cssValue(props.fontFamily)};\n`;
+      if (props.fontSize)       css += `  --font-${r}-size: ${cssValue(props.fontSize)};\n`;
+      if (props.fontWeight)     css += `  --font-${r}-weight: ${cssValue(props.fontWeight)};\n`;
+      if (props.lineHeight)     css += `  --font-${r}-line-height: ${cssValue(props.lineHeight)};\n`;
+      if (props.letterSpacing)  css += `  --font-${r}-letter-spacing: ${cssValue(props.letterSpacing)};\n`;
     }
   }
 
   // spacing → --spacing-{scale}
   if (tokens.spacing && typeof tokens.spacing === 'object') {
     for (const [scale, value] of Object.entries(tokens.spacing)) {
-      css += `  --spacing-${cssName(scale)}: ${value};\n`;
+      css += `  --spacing-${cssName(scale)}: ${cssValue(value)};\n`;
     }
   }
 
   // rounded → --rounded-{scale}
   if (tokens.rounded && typeof tokens.rounded === 'object') {
     for (const [scale, value] of Object.entries(tokens.rounded)) {
-      css += `  --rounded-${cssName(scale)}: ${value};\n`;
+      css += `  --rounded-${cssName(scale)}: ${cssValue(value)};\n`;
     }
   }
 
@@ -232,9 +232,9 @@ export function applyTheme(tokens) {
 
   if (darkCanvas || darkInk || darkBody) {
     css += 'body.dark {\n';
-    if (darkCanvas && c['surface'])  css += `  --color-canvas: ${darkCanvas};\n`;
-    if (darkInk    && c['on-dark'])  css += `  --color-ink: ${darkInk};\n`;
-    if (darkBody   && c['on-dark'])  css += `  --color-body: ${darkBody};\n`;
+    if (darkCanvas && c['surface'])  css += `  --color-canvas: ${cssValue(darkCanvas)};\n`;
+    if (darkInk    && c['on-dark'])  css += `  --color-ink: ${cssValue(darkInk)};\n`;
+    if (darkBody   && c['on-dark'])  css += `  --color-body: ${cssValue(darkBody)};\n`;
     css += '}\n';
   }
 
@@ -251,6 +251,11 @@ export function applyTheme(tokens) {
 /** Convert a token key to a CSS-safe name (pass through hyphens, lower-case) */
 function cssName(key) {
   return String(key).toLowerCase().replace(/[^a-z0-9-]/g, '-');
+}
+
+/** Strip characters that could break out of a CSS property value */
+function cssValue(v) {
+  return String(v).replace(/[{};<>]/g, '');
 }
 
 // ── render ─────────────────────────────────────────────────────────────────
