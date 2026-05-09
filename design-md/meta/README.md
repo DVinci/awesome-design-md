@@ -1,5 +1,7 @@
-# Meta Inspired Design System
+# Meta Design System
 
-Design system details have been moved to: https://getdesign.md/meta/design-md
+Visual identity and design tokens captured from <https://www.meta.com>.
 
-You can also view previews, dark mode examples, and download options on getdesign.md.
+Design system details: <https://getdesign.md/meta/design-md>
+
+Drop `DESIGN.md` into your project and tell your AI coding agent to read it before generating UI to replicate Meta's visual language.
