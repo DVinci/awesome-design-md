@@ -80,10 +80,11 @@ for (const filePath of files) {
   let rawDescription = '';
 
   if (!fmResult) {
-    // Markdown-only file: derive name from heading
-    name = nameFromMarkdown(content, slug);
+    // Markdown-only file: normalise CRLF before any regex work
+    const normalised = content.replace(/\r\n/g, '\n');
+    name = nameFromMarkdown(normalised, slug);
     // Use first non-heading paragraph as description
-    const firstPara = content.replace(/^#[^\n]*\n+/, '').match(/^[^#\n][^\n]*/m);
+    const firstPara = normalised.replace(/^#[^\n]*\n+/, '').match(/^[^#\n][^\n]*/m);
     rawDescription = firstPara ? firstPara[0].trim() : '';
   } else {
     // Try full YAML parse first
@@ -103,6 +104,9 @@ for (const filePath of files) {
       rawDescription = extractDescriptionFromRaw(fmResult.raw);
     }
   }
+
+  // Strip curly-brace token references (e.g. {colors.brand-yellow}) before truncation
+  rawDescription = rawDescription.replace(/\{[^}]+\}/g, '').trim();
 
   // Normalise description: collapse whitespace, truncate to 200 chars
   const description = rawDescription.replace(/\s+/g, ' ').trim().slice(0, 200);

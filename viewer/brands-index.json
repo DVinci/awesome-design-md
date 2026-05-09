@@ -152,13 +152,13 @@
   {
     "name": "Kraken",
     "slug": "kraken",
-    "description": "",
+    "description": "Kraken's website is a clean, trustworthy crypto exchange that uses purple as its commanding brand color. The design operates on white backgrounds with Kraken Purple (`#7132f5`, `#5741d8`, `#5b1ecf`) c",
     "path": "design-md/kraken/DESIGN.md"
   },
   {
     "name": "Lamborghini",
     "slug": "lamborghini",
-    "description": "",
+    "description": "Lamborghini's website is a cathedral of darkness — a digital stage where jet-black surfaces stretch infinitely and every element emerges from the void like a machine under a spotlight. The page is alm",
     "path": "design-md/lamborghini/DESIGN.md"
   },
   {
@@ -170,13 +170,13 @@
   {
     "name": "Lovable",
     "slug": "lovable",
-    "description": "",
+    "description": "Lovable's website radiates warmth through restraint. The entire page sits on a creamy, parchment-toned background (`#f7f4ed`) that immediately separates it from the cold-white conventions of most deve",
     "path": "design-md/lovable/DESIGN.md"
   },
   {
     "name": "Mastercard",
     "slug": "mastercard",
-    "description": "",
+    "description": "Mastercard's experience reads like a warm, editorial magazine built from soft stone and signal orange. The canvas is a muted putty-cream (`#F3F0EE`) — not white, not gray, but a color that feels like ",
     "path": "design-md/mastercard/DESIGN.md"
   },
   {
@@ -200,7 +200,7 @@
   {
     "name": "Miro",
     "slug": "miro",
-    "description": "Miro presents itself as the AI-powered visual workspace through a confident, almost playful brand voice — anchored by its signature canary yellow ({colors.brand-yellow}) wordmark over white canvas, br",
+    "description": "Miro presents itself as the AI-powered visual workspace through a confident, almost playful brand voice — anchored by its signature canary yellow () wordmark over white canvas, broken open by colorful",
     "path": "design-md/miro/DESIGN.md"
   },
   {
@@ -212,7 +212,7 @@
   {
     "name": "MongoDB",
     "slug": "mongodb",
-    "description": "MongoDB carries a strong dual-mode visual identity — dark deep-teal hero bands with bright MongoDB green ({colors.brand-green}) CTAs paired with stark white documentation surfaces. The signature green",
+    "description": "MongoDB carries a strong dual-mode visual identity — dark deep-teal hero bands with bright MongoDB green () CTAs paired with stark white documentation surfaces. The signature green pill button is unmi",
     "path": "design-md/mongodb/DESIGN.md"
   },
   {
@@ -230,7 +230,7 @@
   {
     "name": "Notion",
     "slug": "notion",
-    "description": "Notion presents itself as the all-in-one workspace through a confident, illustration-rich brand voice — anchored by a deep navy hero band ({colors.brand-navy}) decorated with brand-colored sticky-note",
+    "description": "Notion presents itself as the all-in-one workspace through a confident, illustration-rich brand voice — anchored by a deep navy hero band () decorated with brand-colored sticky-note dots and mesh wire",
     "path": "design-md/notion/DESIGN.md"
   },
   {
@@ -302,43 +302,43 @@
   {
     "name": "Runway",
     "slug": "runwayml",
-    "description": "",
+    "description": "Runway's interface is a cinematic reel brought to life as a website — a dark, editorial, film-production-grade design where full-bleed photography and video ARE the primary UI elements. This is not a ",
     "path": "design-md/runwayml/DESIGN.md"
   },
   {
     "name": "Sanity",
     "slug": "sanity",
-    "description": "",
+    "description": "Sanity's website is a developer-content platform rendered as a nocturnal command center -- dark, precise, and deeply structured. The entire experience sits on a near-black canvas (`#0b0b0b`) that read",
     "path": "design-md/sanity/DESIGN.md"
   },
   {
     "name": "Sentry",
     "slug": "sentry",
-    "description": "",
+    "description": "Sentry's website is a dark-mode-first developer tool interface that speaks the language of code editors and terminal windows. The entire aesthetic is rooted in deep purple-black backgrounds (`#1f1633`",
     "path": "design-md/sentry/DESIGN.md"
   },
   {
     "name": "Shopify",
     "slug": "shopify",
-    "description": "",
+    "description": "Shopify.com is a dark-first digital theatre — a website that stages its commerce platform like a cinematic premiere. The entire experience unfolds against an abyss of near-black surfaces that carry th",
     "path": "design-md/shopify/DESIGN.md"
   },
   {
     "name": "SpaceX",
     "slug": "spacex",
-    "description": "",
+    "description": "SpaceX's website is a full-screen cinematic experience that treats aerospace engineering like a film — every section is a scene, every photograph is a frame, and the interface disappears entirely behi",
     "path": "design-md/spacex/DESIGN.md"
   },
   {
     "name": "Spotify",
     "slug": "spotify",
-    "description": "",
+    "description": "Spotify's web interface is a dark, immersive music player that wraps listeners in a near-black cocoon (`#121212`, `#181818`, `#1f1f1f`) where album art and content become the primary source of color. ",
     "path": "design-md/spotify/DESIGN.md"
   },
   {
     "name": "Starbucks",
     "slug": "starbucks",
-    "description": "",
+    "description": "Starbucks' design system is a **warm, confident retail flagship** wearing the green of their storefront apron across every surface. The canvas alternates between a neutral-warm cream (`#f2f0eb`) and a",
     "path": "design-md/starbucks/DESIGN.md"
   },
   {
@@ -350,25 +350,25 @@
   {
     "name": "Stripe",
     "slug": "stripe",
-    "description": "",
+    "description": "Stripe's website is the gold standard of fintech design -- a system that manages to feel simultaneously technical and luxurious, precise and warm. The page opens on a clean white canvas (`#ffffff`) wi",
     "path": "design-md/stripe/DESIGN.md"
   },
   {
     "name": "Supabase",
     "slug": "supabase",
-    "description": "",
+    "description": "Supabase's website is a dark-mode-native developer platform that channels the aesthetic of a premium code editor — deep black backgrounds (`#0f0f0f`, `#171717`) with emerald green accents (`#3ecf8e`, ",
     "path": "design-md/supabase/DESIGN.md"
   },
   {
     "name": "Superhuman",
     "slug": "superhuman",
-    "description": "",
+    "description": "Superhuman's website feels like opening a luxury envelope — predominantly white, immaculately clean, with a single dramatic gesture of color that commands attention. The hero section is a cinematic pu",
     "path": "design-md/superhuman/DESIGN.md"
   },
   {
     "name": "Tesla",
     "slug": "tesla",
-    "description": "",
+    "description": "Tesla's website is an exercise in radical subtraction — a digital showroom where the product is everything and the interface is almost nothing. The page opens with a full-viewport hero that fills the ",
     "path": "design-md/tesla/DESIGN.md"
   },
   {
@@ -380,7 +380,7 @@
   {
     "name": "The Verge",
     "slug": "theverge",
-    "description": "",
+    "description": "The Verge's 2024 redesign feels like somebody wired a Condé Nast magazine to a chiptune soundboard. The canvas is almost-black (`#131313`), the headlines are built from a brutally heavy display face (",
     "path": "design-md/theverge/DESIGN.md"
   },
   {
@@ -392,13 +392,13 @@
   {
     "name": "Together AI",
     "slug": "together.ai",
-    "description": "",
+    "description": "Together AI's interface is a pastel-gradient dreamscape built for enterprise AI infrastructure — a design that somehow makes GPU clusters and model inference feel light, airy, and optimistic. The hero",
     "path": "design-md/together.ai/DESIGN.md"
   },
   {
     "name": "Uber",
     "slug": "uber",
-    "description": "",
+    "description": "Uber's design language is a masterclass in confident minimalism -- a black-and-white universe where every pixel serves a purpose and nothing decorates without earning its place. The entire experience ",
     "path": "design-md/uber/DESIGN.md"
   },
   {
@@ -410,49 +410,49 @@
   {
     "name": "Vercel",
     "slug": "vercel",
-    "description": "",
+    "description": "Vercel's website is the visual thesis of developer infrastructure made invisible — a design system so restrained it borders on philosophical. The page is overwhelmingly white (`#ffffff`) with near-bla",
     "path": "design-md/vercel/DESIGN.md"
   },
   {
     "name": "Vodafone",
     "slug": "vodafone",
-    "description": "",
+    "description": "Vodafone's corporate web system carries the confident, broadcast-scale presence of a global telecom brand — built around a single, fiercely-owned brand red and a restrained, editorial layout that lets",
     "path": "design-md/vodafone/DESIGN.md"
   },
   {
     "name": "VoltAgent",
     "slug": "voltagent",
-    "description": "",
+    "description": "VoltAgent's interface is a deep-space command terminal for the AI age — a developer-facing darkness built on near-pure-black surfaces (`#050507`) where the only interruption is the electric pulse of e",
     "path": "design-md/voltagent/DESIGN.md"
   },
   {
     "name": "Warp",
     "slug": "warp",
-    "description": "",
+    "description": "Warp's website feels like sitting at a campfire in a deep forest — warm, dark, and alive with quiet confidence. Unlike the cold, blue-tinted blacks favored by most developer tools, Warp wraps everythi",
     "path": "design-md/warp/DESIGN.md"
   },
   {
     "name": "Webflow",
     "slug": "webflow",
-    "description": "",
+    "description": "Webflow's website is a visually rich, tool-forward platform that communicates \"design without code\" through clean white surfaces, the signature Webflow Blue (`#146ef5`), and a rich secondary color pal",
     "path": "design-md/webflow/DESIGN.md"
   },
   {
     "name": "WIRED",
     "slug": "wired",
-    "description": "",
+    "description": "WIRED's homepage feels like a printed broadsheet that someone has plugged into a wall socket. The grid is dense, the rules are thin, the type is loud, and almost every surface is paper-white or pure b",
     "path": "design-md/wired/DESIGN.md"
   },
   {
     "name": "Wise",
     "slug": "wise",
-    "description": "",
+    "description": "Wise's website is a bold, confident fintech platform that communicates \"money without borders\" through massive typography and a distinctive lime-green accent. The design operates on a warm off-white c",
     "path": "design-md/wise/DESIGN.md"
   },
   {
     "name": "xAI",
     "slug": "x.ai",
-    "description": "",
+    "description": "xAI's website is a masterclass in dark-first, monospace-driven brutalist minimalism -- a design system that feels like it was built by engineers who understand that restraint is the ultimate form of s",
     "path": "design-md/x.ai/DESIGN.md"
   },
   {
@@ -464,7 +464,7 @@
   {
     "name": "Zapier",
     "slug": "zapier",
-    "description": "",
+    "description": "Zapier's website radiates warm, approachable professionalism. It rejects the cold monochrome minimalism of developer tools in favor of a cream-tinted canvas (`#fffefb`) that feels like unbleached pape",
     "path": "design-md/zapier/DESIGN.md"
   }
 ]
