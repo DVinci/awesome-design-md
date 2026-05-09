@@ -124,6 +124,15 @@ export async function loadBrand(slug) {
     const text = await res.text();
     if (seq !== loadSeq) return; // stale — a newer load started
     const tokens = parseFrontmatter(text);
+    if (!tokens) {
+      // Prose-only DESIGN.md — no structured tokens
+      const hero = document.getElementById('brand-hero');
+      hero.innerHTML = `<div class="hero-prose">
+        <h1>${escapeHtml(slug)}</h1>
+        <p class="prose-note">This brand's DESIGN.md is prose-only and doesn't include structured YAML tokens. The interactive demo isn't available for it yet.</p>
+      </div>`;
+      return;
+    }
     const resolved = resolveTokens(tokens);
     applyTheme(resolved);
     render(resolved);
@@ -131,22 +140,30 @@ export async function loadBrand(slug) {
     if (seq !== loadSeq) return; // stale
     console.error(`[viewer] Failed to load brand "${slug}":`, err);
     const hero = document.getElementById('brand-hero');
-    hero.innerHTML = `<div class="hero-empty"><strong>Error loading "${escapeHtml(slug)}"</strong>${escapeHtml(err.message)}</div>`;
+    const isYaml = err.message.includes('indentation') || err.message.includes('mapping') || err.message.includes('document separator') || err.message.includes('unexpected');
+    const friendly = isYaml
+      ? 'This brand\'s DESIGN.md has a YAML syntax error and can\'t be parsed. The source file may need updating.'
+      : escapeHtml(err.message);
+    hero.innerHTML = `<div class="hero-empty"><strong>Error loading "${escapeHtml(slug)}"</strong>${friendly}</div>`;
   }
 }
 
 // ── parseFrontmatter ───────────────────────────────────────────────────────
+// Returns parsed token object, or null if the file has no YAML frontmatter.
 export function parseFrontmatter(text) {
-  // Find the YAML block between the first and second --- fences
-  const start = text.indexOf('---');
-  if (start === -1) throw new Error('No frontmatter found (missing opening ---)');
+  // Strip BOM and normalise line endings
+  const normalised = text.replace(/^﻿/, '').replace(/\r\n/g, '\n');
 
-  const end = text.indexOf('---', start + 3);
-  if (end === -1) throw new Error('No frontmatter found (missing closing ---)');
+  // Frontmatter must start at position 0 — files where --- only appears
+  // inside markdown table rows (|---|---|) must be treated as prose-only.
+  if (!normalised.startsWith('---\n')) return null;
 
-  const yaml = text.slice(start + 3, end).trim();
+  const end = normalised.indexOf('\n---', 3);
+  if (end === -1) return null;
+
+  const yaml = normalised.slice(3, end).trim();
   const parsed = window.jsyaml.load(yaml);
-  if (!parsed || typeof parsed !== 'object') throw new Error('Frontmatter parsed to non-object');
+  if (!parsed || typeof parsed !== 'object') return null;
   return parsed;
 }
 
