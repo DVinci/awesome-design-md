@@ -66,6 +66,12 @@
     "path": "design-md/cal/DESIGN.md"
   },
   {
+    "name": "ChungiYoo",
+    "slug": "chungiyoo",
+    "description": "ChungiYoo is the personal portfolio of Chung-Yun Yoo, a Germany-based Art Director, Graphic Designer, and Illustrator. The design language is warm, expressive, and editorial — anchored by a biscuit-to",
+    "path": "design-md/chungiyoo/DESIGN.md"
+  },
+  {
     "name": "Claude",
     "slug": "claude",
     "description": "A warm-canvas editorial interface for Anthropic's Claude product. The system anchors on a tinted cream canvas with serif display headlines, warm coral CTAs, and dark navy product surfaces (code editor",
