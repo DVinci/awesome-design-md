@@ -132,6 +132,12 @@
     "path": "design-md/framer/DESIGN.md"
   },
   {
+    "name": "GitHub",
+    "slug": "github",
+    "description": "GitHub's Primer design system pairs a deep near-black canvas (#0D1117) with a proprietary variable font — Mona Sans — and a single vivid-green primary CTA (#1F883D). The homepage reads like an extensi",
+    "path": "design-md/github/DESIGN.md"
+  },
+  {
     "name": "HashiCorp",
     "slug": "hashicorp",
     "description": "An enterprise-infrastructure marketing canvas built around a near-black ground (#000000) and a system of per-product accent colors — Terraform purple, Vault yellow, Consul pink, Waypoint cyan, Vagrant",
@@ -406,6 +412,12 @@
     "slug": "unesco",
     "description": "UNESCO's website embodies institutional clarity at global scale — a clean, light-mode design anchored by a single brand blue and Inter typography that prioritises legibility and trust over visual nove",
     "path": "design-md/unesco/DESIGN.md"
+  },
+  {
+    "name": "Unity",
+    "slug": "unity",
+    "description": "Unity's design system is a cinematic, dark-canvas developer platform identity that serves game creators worldwide. Built entirely for dark mode, the stark black base canvas and layered near-black surf",
+    "path": "design-md/unity/DESIGN.md"
   },
   {
     "name": "Vercel",
