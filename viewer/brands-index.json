@@ -30,6 +30,12 @@
     "path": "design-md/apple/DESIGN.md"
   },
   {
+    "name": "Awwwards",
+    "slug": "awwwards",
+    "description": "Awwwards is the web design community's most prestigious award platform, and its design language practices radical editorial restraint. A near-monochromatic palette of charcoal (#222222) on warm off-wh",
+    "path": "design-md/awwwards/DESIGN.md"
+  },
+  {
     "name": "Binance",
     "slug": "binance",
     "description": "A confident financial-platform interface anchored on a deep near-black canvas, where Binance's iconic yellow (#FCD535) carries every primary CTA, brand accent, and value-claim moment. Type runs Binanc",
