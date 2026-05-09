@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout *)",
+      "Bash(git push *)",
+      "Bash(mkdir -p \"d:/Projetos/awesome-design-md/.claude/skills/generate-design-md\")"
+    ],
+    "additionalDirectories": [
+      "d:\\Projetos\\awesome-design-md\\.claude\\skills"
+    ]
+  }
+}
