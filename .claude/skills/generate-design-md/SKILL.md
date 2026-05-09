@@ -16,7 +16,8 @@ Structure:
 ---
 version: alpha
 name: ...
-description: ...
+description: |
+  ...
 colors: ...
 typography: ...
 spacing: ...
@@ -28,6 +29,15 @@ components: ...
 ...
 [9 sections + Agent Prompt Guide]
 ```
+
+**`description` field MUST use block literal style (`|`).** Always write:
+```yaml
+description: |
+  Your description text here. Even if it contains colons: like this, or "quotes",
+  or backticks — it is safe because the block literal treats the value as raw text.
+```
+
+Never write `description: Single line with colon: somewhere in it` — YAML will parse `: somewhere` as a nested mapping key and silently corrupt or reject the file. Block literal avoids this entirely and is always safe regardless of the description content.
 
 ---
 
@@ -174,7 +184,9 @@ After collecting all page results, note:
 
 **RGB to hex:** Convert `rgb(R, G, B)` → `#RRGGBB`. Use uppercase hex. Round values.
 
-**RGBA to 8-digit hex:** Convert `rgba(R, G, B, A)` → `#RRGGBBAA` where `AA = round(A × 255)` in uppercase hex. Example: `rgba(255, 255, 255, 0.1)` → `#FFFFFF1A`. Never write `rgba()` strings as color token values — the format validator requires strict hex.
+**RGBA to 8-digit hex:** Convert `rgba(R, G, B, A)` → `#RRGGBBAA` where `AA = round(A × 255)` in uppercase hex. Example: `rgba(255, 255, 255, 0.1)` → `#FFFFFF1A`.
+
+**Strict hex only in `colors:`.** Every color token value must be `"#RRGGBB"` or `"#RRGGBBAA"`. Never write `rgba()`, `rgb()`, `hsl()`, `oklch()`, `color()`, `linear-gradient()`, or any other CSS color function as a token value. Convert them all to hex before writing. The format validator and the viewer both require plain hex strings.
 
 **Semantic naming** — assign these names based on role and frequency:
 
@@ -189,11 +201,14 @@ After collecting all page results, note:
 | Border, separator lines | `hairline` |
 | Dark product surfaces | `surface-dark` |
 | Elevated card background | `surface` |
+| Text on dark surfaces / inverted text | `on-dark` |
 | Error/destructive | `semantic-error` |
 | Success | `semantic-success` |
 | Warning | `semantic-warning` |
 
 Always include at minimum: `primary`, `primary-active`, `ink`, `body`, `muted`, `canvas`, `surface`, `hairline`.
+
+Include `on-dark` whenever the brand has a dark canvas or dark surface mode — the viewer uses this token to set text color on dark backgrounds. For light-only brands, `on-dark` can be omitted.
 
 Add brand-specific accent colors as: `accent-[name]` (e.g., `accent-coral`, `accent-teal`).
 
@@ -423,10 +438,14 @@ design-md/<brand>/
 ```markdown
 # <Brand> Design System
 
-Visual identity and design tokens captured from <URL>.
+Visual identity and design tokens captured from <<URL>>.
+
+Design system details: <https://getdesign.md/<brand>/design-md>
 
 Drop `DESIGN.md` into your project and tell your AI coding agent to read it before generating UI to replicate <Brand>'s visual language.
 ```
+
+Wrap all URLs in `<…>` (angle brackets) to satisfy the MD034 markdownlint rule. The consistency test also requires the `getdesign.md` link to be present.
 
 ---
 
@@ -440,7 +459,8 @@ Before writing the files, verify:
 - [ ] `rounded:` has at minimum 3 named steps
 - [ ] `components:` defines `button-primary`, `button-secondary`, `card-base`
 - [ ] All component values use `{token.reference}` syntax — no hardcoded hex
-- [ ] Description is 2–3 sentences (not a single fragment)
+- [ ] Description uses block literal style (`description: |`) — never a bare single-line scalar
+- [ ] Description contains no `{token.ref}` placeholders — only plain prose text
 - [ ] All 9 markdown sections are present
 - [ ] Agent Prompt Guide is present
 - [ ] Both DESIGN.md and README.md will be created
