@@ -129,7 +129,9 @@
     }
 
     /* ── Controls ──────────────────────────────────────────────────────── */
-    #brand-select {
+    .brand-search-wrap { position: relative; }
+
+    #brand-input {
       width: 100%;
       padding: 7px 10px;
       border: 1px solid var(--ui-border);
@@ -138,17 +140,45 @@
       color: var(--ui-text);
       font-size: 13px;
       font-family: inherit;
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7080'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      padding-right: 28px;
     }
 
-    #brand-select:focus {
+    #brand-input:focus {
       outline: 2px solid var(--ui-accent);
       outline-offset: 1px;
+    }
+
+    #brand-input::placeholder { color: var(--ui-text-muted); }
+
+    #brand-dropdown {
+      position: fixed;
+      z-index: 200;
+      background: var(--ui-sidebar);
+      border: 1px solid var(--ui-border);
+      border-radius: var(--rounded-md);
+      margin-top: 2px;
+      max-height: 260px;
+      overflow-y: auto;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .brand-option {
+      padding: 7px 12px;
+      font-size: 13px;
+      color: var(--ui-text);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-option:hover,
+    .brand-option.highlighted { background: rgba(128,128,128,0.12); }
+
+    .brand-option-empty {
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--ui-text-muted);
+      font-style: italic;
     }
 
     #paste-btn,
@@ -297,6 +327,7 @@
       align-items: center;
       justify-content: center;
       z-index: 999;
+      -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
     }
 
@@ -416,19 +447,21 @@
 
     <div class="sidebar-section">
       <span class="sidebar-label">Brand</span>
-      <select id="brand-select">
-        <option value="">— pick a brand —</option>
-      </select>
+      <div class="brand-search-wrap">
+        <input id="brand-input" type="text" placeholder="Search brands…"
+               autocomplete="off" spellcheck="false" aria-label="Select a brand" />
+        <div id="brand-dropdown" hidden></div>
+      </div>
     </div>
 
     <div class="sidebar-section">
       <span class="sidebar-label">Import</span>
-      <button id="paste-btn">📋 Paste / upload</button>
+      <button id="paste-btn" type="button">📋 Paste / upload</button>
     </div>
 
     <div class="sidebar-section">
       <span class="sidebar-label">Display</span>
-      <button id="dark-toggle">Light mode</button>
+      <button id="dark-toggle" type="button">Light mode</button>
     </div>
 
     <nav id="section-nav">
@@ -474,8 +507,8 @@
       <div class="modal-divider">or upload a file</div>
       <input type="file" id="file-input" accept=".md" />
       <div class="modal-actions">
-        <button id="paste-cancel" class="btn-ghost">Cancel</button>
-        <button id="paste-submit" class="btn-primary">Render</button>
+        <button id="paste-cancel" class="btn-ghost" type="button">Cancel</button>
+        <button id="paste-submit" class="btn-primary" type="button">Render</button>
       </div>
     </div>
   </div>

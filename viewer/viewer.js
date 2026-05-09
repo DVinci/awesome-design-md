@@ -8,6 +8,11 @@
 // ── Stale-fetch guard ──────────────────────────────────────────────────────
 let loadSeq = 0;
 
+// ── Brand search state ─────────────────────────────────────────────────────
+let allBrands = [];
+let currentSlug = '';
+let highlightedIdx = -1;
+
 // ── Intersection Observer for active nav links ─────────────────────────────
 const sectionIds = [
   'colors', 'typography', 'buttons', 'badges',
@@ -40,24 +45,21 @@ function setupSectionObserver() {
 // ── init ───────────────────────────────────────────────────────────────────
 export async function init() {
   // Populate brand dropdown
+  let brands = [];
   try {
     const res = await fetch('./brands-index.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const brands = await res.json();
-    populateBrandSelect(brands);
+    brands = await res.json();
   } catch (err) {
     console.warn('[viewer] Could not load brands-index.json:', err.message);
   }
 
   // Wire event listeners
-  const brandSelect = /** @type {HTMLSelectElement} */ (document.getElementById('brand-select'));
-  const pasteBtn    = document.getElementById('paste-btn');
-  const darkToggle  = document.getElementById('dark-toggle');
-  const fileInput   = /** @type {HTMLInputElement} */ (document.getElementById('file-input'));
+  const pasteBtn   = document.getElementById('paste-btn');
+  const darkToggle = document.getElementById('dark-toggle');
+  const fileInput  = /** @type {HTMLInputElement} */ (document.getElementById('file-input'));
 
-  brandSelect.addEventListener('change', () => {
-    if (brandSelect.value) loadBrand(brandSelect.value);
-  });
+  initBrandSearch(brands);
 
   pasteBtn.addEventListener('click', openPasteModal);
 
@@ -93,26 +95,114 @@ export async function init() {
     reader.readAsText(file);
   });
 
-  // Keyboard: Escape closes modal
+  // Keyboard: Escape closes modal or dropdown
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closePasteModal();
+    if (e.key === 'Escape') { closePasteModal(); closeDropdown(); }
   });
 
   setupSectionObserver();
 }
 
-// ── populateBrandSelect ────────────────────────────────────────────────────
-function populateBrandSelect(brands) {
-  const select = document.getElementById('brand-select');
-  // Clear any existing options except placeholder
-  while (select.options.length > 1) select.remove(1);
+// ── Brand search combobox ──────────────────────────────────────────────────
+function initBrandSearch(brands) {
+  allBrands = brands;
+  const input    = /** @type {HTMLInputElement} */ (document.getElementById('brand-input'));
+  const dropdown = document.getElementById('brand-dropdown');
 
-  for (const brand of brands) {
-    const opt = document.createElement('option');
-    opt.value = brand.slug;
-    opt.textContent = brand.name;
-    select.appendChild(opt);
+  input.addEventListener('focus', () => {
+    renderDropdown(filterBrands(input.value));
+    openDropdown();
+  });
+
+  input.addEventListener('input', () => {
+    highlightedIdx = -1;
+    renderDropdown(filterBrands(input.value));
+    openDropdown();
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const items = /** @type {NodeListOf<HTMLElement>} */ (dropdown.querySelectorAll('.brand-option'));
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      highlightedIdx = Math.min(highlightedIdx + 1, items.length - 1);
+      updateHighlight(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      highlightedIdx = Math.max(highlightedIdx - 1, 0);
+      updateHighlight(items);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const item = items[highlightedIdx];
+      if (item) selectBrandItem(item.dataset.slug, item.dataset.name);
+    }
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (!input.contains(/** @type {Node} */ (e.target)) &&
+        !dropdown.contains(/** @type {Node} */ (e.target))) {
+      closeDropdown();
+    }
+  });
+}
+
+function filterBrands(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return allBrands;
+  return allBrands.filter(b =>
+    b.name.toLowerCase().includes(q) || b.slug.toLowerCase().includes(q),
+  );
+}
+
+function renderDropdown(items) {
+  const dropdown = document.getElementById('brand-dropdown');
+  if (items.length === 0) {
+    dropdown.innerHTML = '<div class="brand-option-empty">No brands match</div>';
+    return;
   }
+  dropdown.innerHTML = items.map(b =>
+    `<div class="brand-option" data-slug="${escapeHtml(b.slug)}" data-name="${escapeHtml(b.name)}">${escapeHtml(b.name)}</div>`,
+  ).join('');
+  dropdown.querySelectorAll('.brand-option').forEach(el => {
+    el.addEventListener('click', () => {
+      selectBrandItem(
+        /** @type {HTMLElement} */ (el).dataset.slug,
+        /** @type {HTMLElement} */ (el).dataset.name,
+      );
+    });
+  });
+}
+
+function updateHighlight(items) {
+  items.forEach((el, i) => el.classList.toggle('highlighted', i === highlightedIdx));
+  items[highlightedIdx]?.scrollIntoView({ block: 'nearest' });
+}
+
+function openDropdown() {
+  const input    = document.getElementById('brand-input');
+  const dropdown = document.getElementById('brand-dropdown');
+  const rect     = input.getBoundingClientRect();
+  dropdown.style.top   = `${rect.bottom + 4}px`;
+  dropdown.style.left  = `${rect.left}px`;
+  dropdown.style.width = `${rect.width}px`;
+  dropdown.removeAttribute('hidden');
+}
+
+function closeDropdown() {
+  document.getElementById('brand-dropdown').setAttribute('hidden', '');
+  highlightedIdx = -1;
+  // Restore input text to the currently loaded brand (if any)
+  if (currentSlug) {
+    const brand = allBrands.find(b => b.slug === currentSlug);
+    if (brand) /** @type {HTMLInputElement} */ (document.getElementById('brand-input')).value = brand.name;
+  }
+}
+
+function selectBrandItem(slug, name) {
+  currentSlug = slug;
+  /** @type {HTMLInputElement} */ (document.getElementById('brand-input')).value = name;
+  closeDropdown();
+  loadBrand(slug);
 }
 
 // ── loadBrand ──────────────────────────────────────────────────────────────
