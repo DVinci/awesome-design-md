@@ -8,7 +8,8 @@
     "test:format": "playwright test tests/design-md-format.spec.ts",
     "test:consistency": "playwright test tests/consistency.spec.ts",
     "test:links": "playwright test tests/links.spec.ts",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "viewer": "npx serve . -l 4242"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
